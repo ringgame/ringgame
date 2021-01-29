@@ -1,0 +1,70 @@
+<html>
+<head>
+<title></title>
+<meta charset="UTF-8"/>
+<meta http-equiv="cache-control" content="no-cache"/>
+
+    <style type="text/css">
+
+        * {
+            margin: 0;
+            padding: 0;
+            font-family: Helvetica, sans-serif;;
+        }
+
+        .overlay{
+            border: 2px solid #ff0000;
+            color: green;
+            padding: 10px;
+        }
+
+        div#right {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+
+        div#left {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 2em;
+        }
+
+        div#log {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+        }
+
+        div#controls {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+        }
+    </style>
+</head>
+
+<body>
+<script src="three.min.js"></script>
+<script src="keyListener.js"></script>
+<script src="stone1.js"></script>
+<script src="linkedlist.js"></script>
+<script src="main.js"></script>
+
+<div class="overlay" id="right">
+    Rings: <span id="rings">0</span><br/>
+    Speed: <span id="speed">0</span>
+</div>
+
+<div class="overlay" id="left">00</div>
+<div class="overlay" id="log">--</div>
+<div class="overlay" id="controls">
+    Controls: w, a, s, d<br/>
+    Accelerate/ Slow down: Space/ Shift<br/>
+    Shoot: Mouseclick<br/>
+    Restart: F5
+</div>
+
+</body>
+</html>
