@@ -50,7 +50,7 @@ function start(){
 function init() {
     //Create scene
     scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2( 0x000000, 0.00075);
+    scene.fog = new THREE.FogExp2( 0x00000, 0.00075);
 
     //Create camera
     camera = new THREE.PerspectiveCamera(50, window.innerWidth/window.innerHeight, 1, 5000);
@@ -60,7 +60,7 @@ function init() {
 
     //First Rings
     for(var i=0; i<rings_count; i++){
-        var object = createRing(0, 0, -(ring_distance*i));
+        var object = createRing(0, 0, -(ring_distance*i), ring_radius);
 
         //Add object to scene
         rings[i] = object;
@@ -81,9 +81,9 @@ function init() {
 
 }
 
-function createRing(x,y,z) {
+function createRing(x,y,z,r) {
     //Create Object Geometry
-    var geometry = new THREE.TorusGeometry(ring_radius, (1/10)*ring_radius, 15, 15 );
+    var geometry = new THREE.TorusGeometry(r, (1/10)*ring_radius, 15, 15 );
 
     //ObjectMaterial
     var material = new THREE.MeshBasicMaterial({ color: 0xffffff});
@@ -102,7 +102,7 @@ function createBullet() {
     var geometry = new THREE.SphereGeometry( bullet_radius, 8, 8 );
 
     //ObjectMaterial
-    var material = new THREE.MeshBasicMaterial({ color: 0xffffff});
+    var material = new THREE.MeshBasicMaterial({ color: 0x45A505});
 
     //Create Objects
     var object = new THREE.Mesh(geometry, material);
@@ -118,7 +118,8 @@ function createObstacle() {
     var geometry = new THREE.TetrahedronGeometry( obstacle_radius );
 
     //ObjectMaterial
-    var material = new THREE.MeshBasicMaterial({ color: 0xffffff});
+    var randomColor ='#'+(Math.random() * 0xFFFFFF << 0).toString(16).padStart(6, '0'); //Math.floor(Math.random()*16777215).toString(16);
+    var material = new THREE.MeshBasicMaterial({ color: randomColor});
 
     //Create Objects
     var object = new THREE.Mesh(geometry, material);
@@ -132,6 +133,7 @@ function createObstacle() {
 
     var gameOb = new Obstacle(object, rings[rings_count-1].position, Math.random()*2 - 1, radius, angle);
     obstacles.append(gameOb);
+    console.log(object.material);
 
     return object;
 }
@@ -181,7 +183,20 @@ function mainLoop() {
         }
 
         if((passed_rings + missed) % 2 == 0){
-
+            var obstacle = createObstacle();
+            scene.add(obstacle);
+        }
+	if((passed_rings + missed) % 3 == 0){
+            var obstacle = createObstacle();
+            scene.add(obstacle);
+            var obstacle = createObstacle();
+            scene.add(obstacle);
+        }
+	if((passed_rings + missed) % 5 == 0){
+            var obstacle = createObstacle();
+            scene.add(obstacle);
+            var obstacle = createObstacle();
+            scene.add(obstacle);
             var obstacle = createObstacle();
             scene.add(obstacle);
         }
@@ -200,11 +215,13 @@ function mainLoop() {
 
         var nZ = rings[rings_count-2].position.z - ring_distance;
 
-        var object = createRing(rX, rY, nZ);
+        var ring_radius_random = 0.75*ring_radius + 0.5*Math.random()*ring_radius;
+        var object = createRing(rX, rY, nZ, ring_radius_random);
 
         //Add object to scene
         rings[rings_count-1] = object;
         scene.add(object);
+
     }
 
 
@@ -232,7 +249,7 @@ function mainLoop() {
     }
 
     if(bullets.length != 0) {
-        if(bullets.first.object.position.z - camera.position.z <= -1000) {
+        if(bullets.first.object.position.z - camera.position.z <= -2000) {
             scene.remove(bullets.first.object);
             bullets.removeFirst();
         }
@@ -259,7 +276,7 @@ function mainLoop() {
             currentObstacle.object.rotation.x += 0.02;
             currentObstacle.object.rotation.y += 0.02;
 
-            currentObstacle.object.position.x = currentObstacle.r_center.x + Math.cos(currentObstacle.angle)*currentObstacle.radius;
+	    currentObstacle.object.position.x = currentObstacle.r_center.x + Math.cos(currentObstacle.angle)*currentObstacle.radius;
             currentObstacle.object.position.y = currentObstacle.r_center.y + Math.sin(currentObstacle.angle)*currentObstacle.radius;
 
             currentObstacle = currentObstacle.next;
@@ -275,7 +292,7 @@ function mainLoop() {
                 var pos = obstacle.object.position.clone();
                 var d = pos.sub(bullet.object.position).length();
 
-                if(d < obstacle_radius + bullet_radius){
+                if(d < obstacle_radius + bullet_radius + 20){
 
                     score += 10000;
                     document.getElementById("log").innerHTML = "+ " + 10000;
