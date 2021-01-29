@@ -51,6 +51,11 @@ function init() {
     //Create scene
     scene = new THREE.Scene();
     scene.fog = new THREE.FogExp2( 0x00000, 0.00075);
+    //Load background texture
+    const loader = new THREE.TextureLoader();
+    loader.load('stars.jpg' , function(texture){
+	scene.background = texture;  
+    });
 
     //Create camera
     camera = new THREE.PerspectiveCamera(50, window.innerWidth/window.innerHeight, 1, 5000);
@@ -133,7 +138,6 @@ function createObstacle() {
 
     var gameOb = new Obstacle(object, rings[rings_count-1].position, Math.random()*2 - 1, radius, angle);
     obstacles.append(gameOb);
-    console.log(object.material);
 
     return object;
 }
@@ -292,7 +296,7 @@ function mainLoop() {
                 var pos = obstacle.object.position.clone();
                 var d = pos.sub(bullet.object.position).length();
 
-                if(d < obstacle_radius + bullet_radius + 20){
+                if(d < obstacle_radius + bullet_radius + 5){
 
                     score += 10000;
                     document.getElementById("log").innerHTML = "+ " + 10000;
