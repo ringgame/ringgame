@@ -211,11 +211,13 @@ function mainLoop() {
 
     if(keyboard.mouse){
         keyboard.mouse = false;
-        projector = new THREE.Projector();
 
         var x = ((2*keyboard.x)/window.innerWidth) -1;
         var y = (((2*keyboard.y)/window.innerHeight) -1)*(-1);
-        var raycaster = projector.pickingRay(new THREE.Vector3(x, y), camera);
+	    
+        var dir = new THREE.Vector3(x, y);
+        var raycaster = new THREE.Raycaster();
+	raycaster.setFromCamera( dir, camera );
 
         var bulletSpeed = raycaster.ray.direction.multiplyScalar(3000);
         bulletSpeed.x += sideSpeed.x;
