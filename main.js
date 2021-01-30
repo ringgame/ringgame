@@ -131,26 +131,26 @@ function mainLoop() {
         }
 
         if((passed_rings + missed) % 2 == 0){
-            var obstacle = geometry.createObstacle(rings, rings_count-1);
+            var obstacle = geometry.createObstacle(rings[rings_count-1]);
 	    obstacles.append(obstacle[1]);
             scene.add(obstacle[0]);
         }
 	if((passed_rings + missed) % 3 == 0){
-            var obstacle = geometry.createObstacle(rings, rings_count-1);
+            var obstacle = geometry.createObstacle(rings[rings_count-1]);
 	    obstacles.append(obstacle[1]);
             scene.add(obstacle[0]);
-            var obstacle = geometry.createObstacle(rings, rings_count-1);
+            var obstacle = geometry.createObstacle(rings[rings_count-1]);
 	    obstacles.append(obstacle[1]);
             scene.add(obstacle[0]);
         }
 	if((passed_rings + missed) % 5 == 0){
-            var obstacle = geometry.createObstacle(rings, rings_count-1);
+            var obstacle = geometry.createObstacle(rings[rings_count-1]);
 	    obstacles.append(obstacle[1]);
             scene.add(obstacle[0]);
-            var obstacle = geometry.createObstacle(rings, rings_count-1);
+            var obstacle = geometry.createObstacle(rings[rings_count-1]);
 	    obstacles.append(obstacle[1]);
             scene.add(obstacle[0]);
-            var obstacle = geometry.createObstacle(rings, rings_count-1);
+            var obstacle = geometry.createObstacle(rings[rings_count-1]);
 	    obstacles.append(obstacle[1]);
             scene.add(obstacle[0]);
         }

@@ -70,7 +70,7 @@ function init() {
         scene.add(object);
 	}	
     for(var i=0; i<rings_count; i++){
-		var obstacle = geometry.createObstacle(rings, i);
+		var obstacle = geometry.createObstacle(rings[i]);
 		obstacles.append(obstacle[1]);
 		scene.add(obstacle[0]);
     }
@@ -97,9 +97,14 @@ function mainLoop() {
 		difficulty = difficulty + 1;
     	for(var i=0; i<rings_count; i++){
     		for(var j=0; j<difficulty; j++){
-				var obstacle = geometry.createObstacle(rings, i);
+				var obstacle = geometry.createObstacle(rings[i]);
 				obstacles.append(obstacle[1]);
 				scene.add(obstacle[0]);
+    			for(var k=0; k<difficulty-1; k++){
+					var obstacle = geometry.createObstacle(obstacle[0], 50);
+					obstacles.append(obstacle[1]);
+					scene.add(obstacle[0]);
+				}
     		}		
 		}
 	}
