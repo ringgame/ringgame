@@ -1,5 +1,5 @@
 "use strict";
-import Geometry from "./geometry.js";
+import GeometryFactory from "./geometry.js";
 
 //Global variables
 var scene;
@@ -50,7 +50,7 @@ function init() {
 
     //Load background texture
     const loader = new THREE.TextureLoader();
-    loader.load('stars.jpg' , function(texture){scene.background = texture;});
+    loader.load('../img/stars.jpg' , function(texture){scene.background = texture;});
 
     //Create camera
     camera = new THREE.PerspectiveCamera(50, window.innerWidth/window.innerHeight, 1, 5000);
@@ -59,7 +59,7 @@ function init() {
     camera.position.x = 0;
     
     //Create geometry object (creates geometry objects for us)
-    geometry = new Geometry(ring_radius, bullet_radius, obstacle_radius, rings_count);
+    geometry = new GeometryFactory(ring_radius, bullet_radius, obstacle_radius, rings_count);
     
 	//Add first Rings
     for(var i=0; i<rings_count; i++){

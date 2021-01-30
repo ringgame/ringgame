@@ -28,9 +28,9 @@
             position: fixed;
             top: 20px;
             left: 50%;
-	    transform: translate(-50%, -50%);
+	    	transform: translate(-50%, -50%);
             font-size: 2em;
-	    opacity: 0.5;
+	    	opacity: 0.5;
         }
 
         div#right {
@@ -62,22 +62,15 @@
 
 <body>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r125/three.min.js"></script>
-<script src="keyListener.js"></script>
-<script src="stone1.js"></script>
-<script src="linkedlist.js"></script>
-<script type="module" src="main.js"></script>
+<script src="../js/keyListener.js"></script>
+<script src="../js/stone1.js"></script>
+<script src="../js/linkedlist.js"></script>
+<script type="module" src="../js/training1.js"></script>
 
-<div class="overlay" id="right">
-    rings: <span id="rings">0</span><br/>
-    speed: <span id="speed">0</span>
-</div>
 
-<div id="top"><a href="index.html">menu</a>    <a href="game.html">restart</a></div>
-<div class="overlay" id="left">00</div>
-<div class="overlay" id="log">--</div>
+<div id="top"><a href="../index.html">menu</a>    <a href="../templates/training1.html">restart</a></div>
 <div class="overlay" id="controls">
     controls: w, a, s, d<br/>
-    speed/ slow: Space/ Shift<br/>
     shoot: click<br/>
     restart: F5
 </div>

@@ -1,4 +1,4 @@
-export default class Geometry {
+export default class GeometryFactory {
 	constructor(ring_radius, bullet_radius, obstacle_radius, rings_count) {
 		this.ring_radius = ring_radius;
 		this.bullet_radius = bullet_radius;
@@ -11,7 +11,12 @@ export default class Geometry {
 	    var geometry = new THREE.TorusGeometry(r, (1/10)*this.ring_radius, 15, 15 );
 
 	    //ObjectMaterial
-	    var material = new THREE.MeshBasicMaterial({ color: 0xffffff});
+	    //var material = new THREE.MeshBasicMaterial({ color: 0xffffff});
+
+		var texture = new THREE.TextureLoader().load( '../img/ring.jpg' );
+
+		// immediately use the texture for material creation
+		const material = new THREE.MeshBasicMaterial( { map: texture } );
 
 	    //Create Objects
 	    var object = new THREE.Mesh(geometry, material);
