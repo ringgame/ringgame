@@ -1,5 +1,5 @@
 export default class GeometryFactory {
-	constructor(ring_radius, bullet_radius, obstacle_radius, rings_count, rings_rnd, opponent_geometry) {
+	constructor(ring_radius, bullet_radius, obstacle_radius, rings_count, rings_rnd, opponent_geometry=null) {
 		this.ring_radius = ring_radius;
 		this.bullet_radius = bullet_radius;
 		this.obstacle_radius = obstacle_radius;

@@ -25,6 +25,8 @@ const ring_distance = 500;
 const ring_radius = 20;
 const bullet_radius = ring_radius/10;
 const obstacle_radius = ring_radius;
+const ws_seed = "My random seed";
+const rings_rnd = new Math.seedrandom(ws_seed);
 
 const maxSideSpeed = 100;
 const minFrontSpeed = 0;
@@ -59,7 +61,7 @@ function init() {
     camera.position.x = 0;
     
     //Create geometry object (creates geometry objects for us)
-    geometry = new GeometryFactory(ring_radius, bullet_radius, obstacle_radius, rings_count);
+    geometry = new GeometryFactory(ring_radius, bullet_radius, obstacle_radius, rings_count, rings_rnd);
     
 	//Add first Rings
     for(var i=0; i<rings_count; i++){
@@ -126,7 +128,7 @@ function mainLoop() {
         bulletSpeed.y += sideSpeed.y;
         bulletSpeed.z -= frontSpeed;
 
-        var bulletObject = geometry.createBullet(camera, rings);
+        var bulletObject = geometry.createBullet(camera.position);
         scene.add(bulletObject);
 
         var bullet = new Bullet(bulletObject, bulletSpeed);
