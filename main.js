@@ -17,21 +17,24 @@ var rings = new Array(4);
 var bullets = new LinkedList();
 var obstacles = new LinkedList();
 var sideSpeed = new THREE.Vector2(0, 0);
+var frontSpeed = 300;
 
 //Constants
-const max_missed = 3;
 const keyboard = new KeyListener();
-const ring_distance = 500;
-const rings_count = 5;
-const ring_radius = 20;
-const frontSpeed = 300;
+
+const maxSideSpeed = 100;
 const minFrontSpeed = 0;
 const maxFrontSpeed = 600;
+const max_possible = maxSideSpeed * (ring_distance / maxFrontSpeed)*1.1;
+
 const frontAcc = 150;
-const maxSideSpeed = 100;
 const sideAcc = 0.5;
 const friction = 0.9;
-const max_possible = maxSideSpeed * (ring_distance / maxFrontSpeed)*1.1;
+
+const max_missed = 3;
+const rings_count = 5;
+const ring_distance = 500;
+const ring_radius = 20;
 const bullet_radius = ring_radius/10;
 const obstacle_radius = ring_radius;
 
