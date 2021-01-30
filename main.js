@@ -22,6 +22,13 @@ var frontSpeed = 300;
 //Constants
 const keyboard = new KeyListener();
 
+const max_missed = 3;
+const rings_count = 5;
+const ring_distance = 500;
+const ring_radius = 20;
+const bullet_radius = ring_radius/10;
+const obstacle_radius = ring_radius;
+
 const maxSideSpeed = 100;
 const minFrontSpeed = 0;
 const maxFrontSpeed = 600;
@@ -31,12 +38,6 @@ const frontAcc = 150;
 const sideAcc = 0.5;
 const friction = 0.9;
 
-const max_missed = 3;
-const rings_count = 5;
-const ring_distance = 500;
-const ring_radius = 20;
-const bullet_radius = ring_radius/10;
-const obstacle_radius = ring_radius;
 
 window.onload = start();
 
