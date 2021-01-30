@@ -38,7 +38,7 @@ export default class Geometry {
 	    return object;
 	}
 
-	createObstacle(rings, obstacles) {
+	createObstacle(rings, ring_id) {
 	    //Create Object Geometry
 	    var geometry = new THREE.TetrahedronGeometry( this.obstacle_radius );
 
@@ -52,12 +52,11 @@ export default class Geometry {
 	    var radius = 5*this.ring_radius + 3*this.ring_radius*Math.random();
 	    var angle = Math.random() * 2 *Math.PI;
 
-	    object.position.x = rings[this.rings_count-1].position.x + Math.cos(angle) * radius;
-	    object.position.y = rings[this.rings_count-1].position.y + Math.sin(angle) * radius;
-	    object.position.z = rings[this.rings_count-1].position.z;
+	    object.position.x = rings[ring_id].position.x + Math.cos(angle) * radius;
+	    object.position.y = rings[ring_id].position.y + Math.sin(angle) * radius;
+	    object.position.z = rings[ring_id].position.z;
 
-	    var gameOb = new Obstacle(object, rings[this.rings_count-1].position, Math.random()*2 - 1, radius, angle);
-	    //obstacles.append(gameOb);
+	    var gameOb = new Obstacle(object, rings[ring_id].position, Math.random()*2 - 1, radius, angle);
 
 	    return [object, gameOb];
 	}
