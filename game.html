@@ -1,0 +1,86 @@
+<html>
+<head>
+<title></title>
+<meta charset="UTF-8"/>
+<meta http-equiv="cache-control" content="no-cache"/>
+
+    <style type="text/css">
+	a:link {color: green;}
+	a:visited {color: green;}
+	a:hover {color: green;}
+	a:active {color: green;}
+	body {
+	    background-color: black;
+	}
+        * {
+            margin: 0;
+            padding: 0;
+            font-family: Helvetica, sans-serif;;
+        }
+
+        .overlay{
+            border: 2px solid #ff0000;
+            color: green;
+            padding: 10px;
+        }
+
+        div#top {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+	    transform: translate(-50%, -50%);
+            font-size: 2em;
+	    opacity: 0.5;
+        }
+
+        div#right {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+
+        div#left {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 2em;
+        }
+
+        div#log {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+        }
+
+        div#controls {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+        }
+    </style>
+</head>
+
+<body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r125/three.min.js"></script>
+<script src="keyListener.js"></script>
+<script src="stone1.js"></script>
+<script src="linkedlist.js"></script>
+<script type="module" src="main.js"></script>
+
+<div class="overlay" id="right">
+    rings: <span id="rings">0</span><br/>
+    speed: <span id="speed">0</span>
+</div>
+
+<div id="top"><a href="index.html">menu</a>    <a href="game.html">restart</a></div>
+<div class="overlay" id="left">00</div>
+<div class="overlay" id="log">--</div>
+<div class="overlay" id="controls">
+    controls: w, a, s, d<br/>
+    speed/ slow: Space/ Shift<br/>
+    shoot: click<br/>
+    restart: F5
+</div>
+
+</body>
+</html>
