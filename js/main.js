@@ -1,11 +1,14 @@
 "use strict";
 import GeometryFactory from "./geometry.js";
+//import {OBJLoader} from "./OBJLoader.js";
 
 //Global variables
 var scene;
+var ws;
 var geometry;
 var camera;
 var clock = new THREE.Clock();
+var opponent;
 var renderer;
 var bullet = null;
 
@@ -17,12 +20,18 @@ var rings = new Array(4);
 var bullets = new LinkedList();
 var obstacles = new LinkedList();
 var sideSpeed = new THREE.Vector2(0, 0);
-var frontSpeed = 300;
+var frontSpeed = 0;
+var player_pos;
+var opponent_geometry;
+var loader;
 
 //Constants
 const keyboard = new KeyListener();
+const ws_seed = "My random seed";
+const rings_rnd = new Math.seedrandom(ws_seed);
+console.log(rings_rnd());
 
-const max_missed = 3;
+const max_missed = 11000;
 const rings_count = 5;
 const ring_distance = 500;
 const ring_radius = 20;
@@ -38,12 +47,50 @@ const frontAcc = 150;
 const sideAcc = 0.5;
 const friction = 0.9;
 
-
 window.onload = start();
 
+
+function syncEnvironment(event){
+	//console.log(event.data);
+	const data = JSON.parse(event.data);
+	if (data.type === "pos") {
+		opponent.position.x = data.x;
+		opponent.position.y = data.y;
+		opponent.position.z = data.z;
+	} else if (data.type === "hit") {
+		let cur = obstacles.first;				
+		console.log(cur.id);
+		console.log(data.id);
+		while(cur !== null && cur.id !== data.id) {
+			cur = cur.next;
+		}
+		if (!cur) {
+			console.log("Got message about hit of object " + data.id + ", but I don't have that obstacle.");
+			return;
+		}
+		scene.remove(cur.object);
+		obstacles.remove(cur);
+	} else if (data.type === "bullet") {
+		var bulletObject = geometry.createBullet(opponent.position);
+        scene.add(bulletObject);
+        var bullet = new Bullet(bulletObject, data);
+        bullets.append(bullet);
+	}
+}
+
 function start(){
-    init();
-    window.requestAnimationFrame(mainLoop);
+	/*loader = new OBJLoader();
+	loader.load("../models/opponent.obj", (object) => {
+		opponent_geometry = object;
+		//Create websocket
+		ws = new WebSocket("ws://localhost:8080");
+  		ws.onopen = function(event) {init();console.log("WebSocket is open now.");};
+		ws.onmessage = syncEnvironment;
+	});*/
+	//Create websocket
+	ws = new WebSocket("ws://localhost:8080");
+  	ws.onopen = function(event) {init();console.log("WebSocket is open now.");};
+	ws.onmessage = syncEnvironment;
 }
 
 function init() {
@@ -60,10 +107,16 @@ function init() {
     camera.position.z = ring_distance;
     camera.position.y = 0;
     camera.position.x = 0;
-    
+   	 
     //Create geometry object (creates geometry objects for us)
-    geometry = new GeometryFactory(ring_radius, bullet_radius, obstacle_radius, rings_count);
-
+    geometry = new GeometryFactory(ring_radius, bullet_radius, obstacle_radius, rings_count, rings_rnd, opponent_geometry);
+	
+	//Init random numbers with synced key
+	
+	//Add player
+    opponent = geometry.createOpponent(0, 0, 0, 0);
+    scene.add(opponent);
+	
     //Add first Rings
     for(var i=0; i<rings_count; i++){
         var object = geometry.createRing(0, 0, -(ring_distance*i), ring_radius);
@@ -83,11 +136,18 @@ function init() {
 
     renderer.render( scene, camera );
 
+    window.requestAnimationFrame(mainLoop);
 }
 
 
 function mainLoop() {
     var delta = clock.getDelta()*1000;
+	
+	//Websocket Sycnronization
+	var msg = JSON.stringify({type: "pos", ...camera.position, frontSpeed, sideSpeed, delta});
+	ws.send(msg);
+
+	
 
     //Game logic, win, lose, ring missed
     if(rings[0].position.z >= camera.position.z) {
@@ -130,6 +190,7 @@ function mainLoop() {
             rings[i] = rings[i+1];
         }
 
+		
         if((passed_rings + missed) % 2 == 0){
             var obstacle = geometry.createObstacle(rings[rings_count-1]);
 	    obstacles.append(obstacle[1]);
@@ -154,10 +215,9 @@ function mainLoop() {
 	    obstacles.append(obstacle[1]);
             scene.add(obstacle[0]);
         }
-
-        var rR = Math.random() * max_possible;
-        var rA = Math.random() * 2*Math.PI;
-        var alt = rings[rings_count - 2];
+		
+        var rR = rings_rnd() * max_possible;
+        var rA = rings_rnd() * 2*Math.PI;
 
 	//Random ring position
         var rX = Math.cos(rR)*rR + rings[rings_count-2].position.x;
@@ -165,7 +225,7 @@ function mainLoop() {
         var nZ = rings[rings_count-2].position.z - ring_distance;
         
 	//Random radius of rings
-        var ring_radius_random = 0.75*ring_radius + 0.5*Math.random()*ring_radius;
+        var ring_radius_random = 0.75*ring_radius + 0.5*rings_rnd()*ring_radius;
         var object = geometry.createRing(rX, rY, nZ, ring_radius_random);
 
         //Add object to scene
@@ -190,11 +250,14 @@ function mainLoop() {
         bulletSpeed.y += sideSpeed.y;
         bulletSpeed.z -= frontSpeed;
 
-        var bulletObject = geometry.createBullet(camera, rings);
+        var bulletObject = geometry.createBullet(camera.position);
         scene.add(bulletObject);
 
         var bullet = new Bullet(bulletObject, bulletSpeed);
         bullets.append(bullet);
+		
+		var msg = JSON.stringify({type: "bullet", x:bulletSpeed.x, y:bulletSpeed.y, z:bulletSpeed.z});
+		ws.send(msg);
     }
     
     if(bullets.length != 0) {
@@ -248,6 +311,9 @@ function mainLoop() {
 
                     score += 10000;
                     document.getElementById("log").innerHTML = "+ " + 10000;
+					
+					var msg = JSON.stringify({type: "hit", id: obstacle.id});
+					ws.send(msg);
 
                     scene.remove(bullet.object);
                     scene.remove(obstacle.object);

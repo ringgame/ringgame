@@ -1,10 +1,15 @@
 export default class GeometryFactory {
-	constructor(ring_radius, bullet_radius, obstacle_radius, rings_count) {
+	constructor(ring_radius, bullet_radius, obstacle_radius, rings_count, rings_rnd, opponent_geometry) {
 		this.ring_radius = ring_radius;
 		this.bullet_radius = bullet_radius;
 		this.obstacle_radius = obstacle_radius;
 		this.rings_count = rings_count;
+		this.rings_rnd = rings_rnd;
+		this.n_obstacles = 0;
+		this.opponent = opponent_geometry;
 	}
+
+
 
 	createRing(x,y,z,r) {
 	    //Create Object Geometry
@@ -26,8 +31,32 @@ export default class GeometryFactory {
 
 	    return object;
 	}
+	
+	createOpponent(x,y,z,r) {
+	    //Create Object Geometry
+			
+	    //var geometry = this.opponent; //
+		var geometry = new THREE.TorusGeometry(r, (1/10)*this.ring_radius, 15, 15 );
 
-	createBullet(camera, rings) {
+	    //ObjectMaterial
+	    //var material = new THREE.MeshBasicMaterial({ color: 0xffffff});
+
+		var texture = new THREE.TextureLoader().load( '../img/ring.jpg' );
+
+		// immediately use the texture for material creation
+		const material = new THREE.MeshBasicMaterial( { map: texture } );
+
+	    //Create Objects
+	    var object = new THREE.Mesh(geometry, material);
+	    object.position.x = x;
+	    object.position.y = y;
+	    object.position.z = z;
+
+	    return object;
+	}
+
+	createBullet(camera) {
+		
 	    //Create Object Geometry
 	    var geometry = new THREE.SphereGeometry( this.bullet_radius, 8, 8 );
 
@@ -36,9 +65,9 @@ export default class GeometryFactory {
 
 	    //Create Objects
 	    var object = new THREE.Mesh(geometry, material);
-	    object.position.x = camera.position.x;
-	    object.position.y = camera.position.y;
-	    object.position.z = camera.position.z;
+	    object.position.x = camera.x;
+	    object.position.y = camera.y;
+	    object.position.z = camera.z;
 
 	    return object;
 	}
@@ -48,25 +77,26 @@ export default class GeometryFactory {
 	    var geometry = new THREE.TetrahedronGeometry( this.obstacle_radius );
 
 	    //ObjectMaterial
-	    var randomColor ='#'+(Math.random() * 0xFFFFFF << 0).toString(16).padStart(6, '0'); //Math.floor(Math.random()*16777215).toString(16);
+	    var randomColor ='#'+(this.rings_rnd() * 0xFFFFFF << 0).toString(16).padStart(6, '0'); //Math.floor(Math.random()*16777215).toString(16);
 	    var material = new THREE.MeshBasicMaterial({ color: randomColor});
 
 	    //Create Objects
 	    var object = new THREE.Mesh(geometry, material);
 
 		if(rot_radius == -1){
-	    	var radius = 5*this.ring_radius + 3*this.ring_radius*Math.random();
+	    	var radius = 5*this.ring_radius + 3*this.ring_radius*this.rings_rnd();
 	    } else {
 			var radius = rot_radius;
 		}
-		var angle = Math.random() * 2 *Math.PI;
+		var angle = this.rings_rnd() * 2 *Math.PI;
 
 	    object.position.x = anchor.position.x + Math.cos(angle) * radius;
 	    object.position.y = anchor.position.y + Math.sin(angle) * radius;
 	    object.position.z = anchor.position.z;
 
-	    var gameOb = new Obstacle(object, anchor.position, Math.random()*2 - 1, radius, angle);
-
+	    var gameOb = new Obstacle(object, anchor.position, this.rings_rnd()*2 - 1, radius, angle);
+		gameOb.id = this.n_obstacles;
+		this.n_obstacles++;
 	    return [object, gameOb];
 	}
 }
