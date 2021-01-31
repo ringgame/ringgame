@@ -2,6 +2,7 @@
 import GeometryFactory from "./geometry.js";
 import GameCtrl from "./gamectrl.js";
 import Level0 from "./levels/seeded/level_0.js";
+import { syncEnvironment } from "./sync.js";
 //import {OBJLoader} from "./OBJLoader.js";
 
 //Global variables
@@ -22,7 +23,6 @@ var obstacles = new LinkedList();
 var opponent_geometry;
 var loader;
 
-
 //Constants
 const keyboard = new KeyListener();
 const ws_seed = "My random seed";
@@ -30,36 +30,11 @@ const rings_rnd = new Math.seedrandom(ws_seed);
 console.log(rings_rnd());
 
 
-
 window.onload = start();
 
 
-function syncEnvironment(event){
-	//console.log(event.data);
-	const data = JSON.parse(event.data);
-	if (data.type === "pos") {
-		opponent.position.x = data.x;
-		opponent.position.y = data.y;
-		opponent.position.z = data.z;
-	} else if (data.type === "hit") {
-		let cur = obstacles.first;				
-		console.log(cur.id);
-		console.log(data.id);
-		while(cur !== null && cur.id !== data.id) {
-			cur = cur.next;
-		}
-		if (!cur) {
-			console.log("Got message about hit of object " + data.id + ", but I don't have that obstacle.");
-			return;
-		}
-		scene.remove(cur.object);
-		obstacles.remove(cur);
-	} else if (data.type === "bullet") {
-		var bulletObject = geometry.createBullet(opponent.position);
-        scene.add(bulletObject);
-        var bullet = new Bullet(bulletObject, data);
-        bullets.append(bullet);
-	}
+function sync(event) {
+	syncEnvironment(event, scene, geometry, opponent, bullets);
 }
 
 function start(){
@@ -74,7 +49,7 @@ function start(){
 	//Create websocket
 	ws = new WebSocket("ws://localhost:8080");
   	ws.onopen = function(event) {init();console.log("WebSocket is open now.");};
-	ws.onmessage = syncEnvironment;
+	ws.onmessage = sync;
 }
 
 function init() {
@@ -84,22 +59,17 @@ function init() {
     const loader = new THREE.TextureLoader();
     loader.load('../img/stars.jpg' , function(texture){scene.background = texture;});
    	 
-    //Create geometry object
-	var rings_count = 5;
-	var ring_distance = 500;
-	var ring_radius = 20;
-	var bullet_radius = ring_radius/10;
-	var obstacle_radius = ring_radius;
+    //Create geometry object (MODEL)
+	var rings_count = 5; var ring_distance = 500; var ring_radius = 20;
+	var bullet_radius = ring_radius/10; var obstacle_radius = ring_radius;
     geometry = new GeometryFactory(ring_radius, bullet_radius, obstacle_radius, rings_count, rings_rnd, ring_distance, opponent_geometry);
 
-    //Create gamectrl object
-	var max_missed = 3;
-	var maxSideSpeed = 100;
-	var minFrontSpeed = 0;
-	var maxFrontSpeed = 600;
+    //Create gamectrl object (CONTROLLER)
+	var max_missed = 3; var maxSideSpeed = 100;
+	var minFrontSpeed = 0; var maxFrontSpeed = 600;
 	gamectrl = new GameCtrl(geometry, max_missed, maxSideSpeed, minFrontSpeed, maxFrontSpeed);
 
-	//Create level environment loader and init env
+	//Create level environment loader and init env (VIEW)
 	level = new Level0(gamectrl, geometry, rings_rnd);
 	rings = level.init(scene, rings );
 	
