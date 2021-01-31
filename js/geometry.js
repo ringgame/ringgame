@@ -1,9 +1,10 @@
 export default class GeometryFactory {
-	constructor(ring_radius, bullet_radius, obstacle_radius, rings_count, rings_rnd, ring_distance, opponent_geometry=null) {
+	constructor(ring_radius, bullet_radius, obstacle_radius, rings_count, rings_rnd, ring_distance, player_radius, opponent_geometry=null) {
 		this.ring_radius = ring_radius;
 		this.bullet_radius = bullet_radius;
 		this.obstacle_radius = obstacle_radius;
 		this.rings_count = rings_count;
+		this.player_radius = player_radius;
 		this.ring_distance = ring_distance;
 		this.rings_rnd = rings_rnd;
 		this.n_obstacles = 0;

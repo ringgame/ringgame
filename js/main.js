@@ -61,8 +61,8 @@ function init() {
    	 
     //Create geometry object (MODEL)
 	var rings_count = 5; var ring_distance = 500; var ring_radius = 20;
-	var bullet_radius = ring_radius/10; var obstacle_radius = ring_radius;
-    geometry = new GeometryFactory(ring_radius, bullet_radius, obstacle_radius, rings_count, rings_rnd, ring_distance, opponent_geometry);
+	var bullet_radius = ring_radius/10; var obstacle_radius = ring_radius; var player_radius=4;
+    geometry = new GeometryFactory(ring_radius, bullet_radius, obstacle_radius, rings_count, rings_rnd, ring_distance, player_radius, opponent_geometry);
 
     //Create gamectrl object (CONTROLLER)
 	var max_missed = 3; var maxSideSpeed = 100;
@@ -74,7 +74,7 @@ function init() {
 	rings = level.init(scene, rings );
 	
 	//Add player
-    opponent = geometry.createOpponent(0, 0, 1000, 4);
+    opponent = geometry.createOpponent(0, 0, 1000, geometry.player_radius);
     scene.add(opponent);
 
     //Create camera
@@ -117,7 +117,7 @@ function mainLoop() {
 	level.envUpdate(scene, camera, rings, obstacles);
 	
 	//Fire bullets and check if they hit
-	gamectrl.shooting(scene, ws, camera, keyboard, geometry, bullets, obstacles, delta );
+	gamectrl.shooting(scene, ws, camera, keyboard, geometry, bullets, obstacles, opponent, delta );
 
 	//Control: UP, DOWN, SPEED, SLOW, et, etcc
 	gamectrl.controls(keyboard, delta);

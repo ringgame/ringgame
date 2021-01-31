@@ -28,8 +28,8 @@ export default class GameCtrl {
 
         	} else if(distanceToMiddle < geometry.ring_radius){
             	this.passed_rings++;
-            	this.score += 1000 * this.frontSpeed/100;
-            	document.getElementById("log").innerHTML = "pass: +" + Math.round((1000 * (this.frontSpeed/100)));
+            	this.score += 25 * this.frontSpeed/100;
+            	document.getElementById("log").innerHTML = "pass: +" + Math.round((25 * (this.frontSpeed/100)));
 
         	} else {
             	this.missed++;
@@ -90,7 +90,7 @@ export default class GameCtrl {
 		
 	}
 	
-	shooting(scene, ws, camera, keyboard, geometry, bullets, obstacles, delta) {
+	shooting(scene, ws, camera, keyboard, geometry, bullets, obstacles, opponent, delta) {
 			//Shooting
 			if(keyboard.mouse){
 				keyboard.mouse = false;
@@ -155,6 +155,50 @@ export default class GameCtrl {
 				}
 			}
 			
+			//Check if we are hit	
+			var bullet = bullets.first;
+			while(bullet != null){
+
+				var pos = camera.position.clone();
+				var d = pos.sub(bullet.object.position).length();
+
+				//Check wheter shot hit
+				if(d < geometry.player_radius + geometry.bullet_radius + 5){
+
+					document.getElementById("log").innerHTML = "DEAD - halt";
+					this.frontSpeed = 0;	
+					this.sideSpeed = new THREE.Vector2(0, 0);
+					scene.remove(bullet.object);
+					bullets.remove(bullet);
+				}
+
+
+				bullet = bullet.next;
+			}
+
+			//Check if we hit opponent
+			var bullet = bullets.first;
+			while(bullet != null){
+
+				var pos = opponent.position.clone();
+				var d = pos.sub(bullet.object.position).length();
+
+				//Check wheter shot hit
+				if(d < geometry.player_radius + geometry.bullet_radius + 5){
+
+					this.score += 100;
+					document.getElementById("log").innerHTML = "headshot: " + 100;
+					
+					scene.remove(bullet.object);
+					bullets.remove(bullet);
+				}
+
+
+				bullet = bullet.next;
+			}
+
+
+			//Check if we hit an obstacle
 			if(obstacles.length != 0 && bullets.length != 0){
 				var obstacle = obstacles.first;
 				while(obstacle != null){
@@ -167,8 +211,8 @@ export default class GameCtrl {
 						//Check wheter shot hit
 						if(d < geometry.obstacle_radius + geometry.bullet_radius + 5){
 
-							this.score += 10000;
-							document.getElementById("log").innerHTML = "hit: +" + 10000;
+							this.score += 50;
+							document.getElementById("log").innerHTML = "hit: +" + 50;
 							
 							var msg = JSON.stringify({type: "hit", id: obstacle.id});
 							ws.send(msg);
