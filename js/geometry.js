@@ -4,10 +4,10 @@ export default class GeometryFactory {
 		this.bullet_radius = bullet_radius;
 		this.obstacle_radius = obstacle_radius;
 		this.rings_count = rings_count;
+		this.ring_distance = ring_distance;
 		this.rings_rnd = rings_rnd;
 		this.n_obstacles = 0;
 		this.opponent = opponent_geometry;
-		this.ring_distance = ring_distance;
 	}
 
 

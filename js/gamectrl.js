@@ -1,14 +1,14 @@
 export default class GameCtrl {
-	constructor(ring_distance) {
+	constructor(geometry, max_missed, maxSideSpeed, minFrontSpeed, maxFrontSpeed) {
 		this.score = 0;
 		this.passed_rings = 0;
 		this.missed = 0;
-		this.max_missed = 3;
+		this.max_missed = max_missed;
 		
-		this.maxSideSpeed = 100;
-		this.minFrontSpeed = 0;
-		this.maxFrontSpeed = 600;
-		this.max_possible = this.maxSideSpeed * (ring_distance / this.maxFrontSpeed)*1.1;
+		this.maxSideSpeed = maxSideSpeed;
+		this.minFrontSpeed = minFrontSpeed;
+		this.maxFrontSpeed = maxFrontSpeed;
+		this.max_possible = this.maxSideSpeed * (geometry.ring_distance / this.maxFrontSpeed)*1.1;
 		
 		this.sideSpeed = new THREE.Vector2(0, 0);
 		this.frontSpeed = 0;
@@ -90,4 +90,101 @@ export default class GameCtrl {
 		
 	}
 	
+	shooting(scene, ws, camera, keyboard, geometry, bullets, obstacles, delta) {
+			//Shooting
+			if(keyboard.mouse){
+				keyboard.mouse = false;
+
+				var x = ((2*keyboard.x)/window.innerWidth) -1;
+				var y = (((2*keyboard.y)/window.innerHeight) -1)*(-1);
+				
+				var dir = new THREE.Vector3(x, y);
+				var raycaster = new THREE.Raycaster();
+				raycaster.setFromCamera( dir, camera );
+
+				//Accelerate bullet with ray vector
+				var bulletSpeed = raycaster.ray.direction.multiplyScalar(3000);
+				bulletSpeed.x += this.sideSpeed.x;
+				bulletSpeed.y += this.sideSpeed.y;
+				bulletSpeed.z -= this.frontSpeed;
+
+				var bulletObject = geometry.createBullet(camera.position);
+				scene.add(bulletObject);
+
+				var bullet = new Bullet(bulletObject, bulletSpeed);
+				bullets.append(bullet);
+				
+				var msg = JSON.stringify({type: "bullet", x:bulletSpeed.x, y:bulletSpeed.y, z:bulletSpeed.z});
+				ws.send(msg);
+			}
+			
+			if(bullets.length != 0) {
+				//Bulltes out of range?
+				if(bullets.first.object.position.z - camera.position.z <= -2000) {
+					scene.remove(bullets.first.object);
+					bullets.removeFirst();
+				}
+
+				var currentBullet = bullets.first;
+				while(currentBullet != null){
+					currentBullet.object.position.x += currentBullet.speed.x*delta/1000;
+					currentBullet.object.position.y += currentBullet.speed.y*delta/1000;
+					currentBullet.object.position.z += currentBullet.speed.z*delta/1000;
+					currentBullet = currentBullet.next;
+				}
+			}
+
+			if(obstacles.length != 0) {
+				//Obstacle out of range
+				if(obstacles.first.object.position.z - camera.position.z >= 0) {
+					scene.remove(obstacles.first.object);
+					obstacles.removeFirst();
+				}
+
+				var currentObstacle = obstacles.first;
+				while(currentObstacle != null){
+					currentObstacle.angle = currentObstacle.angle + (delta * currentObstacle.speed)/1000;
+
+					currentObstacle.object.rotation.x += 0.02;
+					currentObstacle.object.rotation.y += 0.02;
+
+					currentObstacle.object.position.x = currentObstacle.r_center.x + Math.cos(currentObstacle.angle)*currentObstacle.radius;
+					currentObstacle.object.position.y = currentObstacle.r_center.y + Math.sin(currentObstacle.angle)*currentObstacle.radius;
+
+					currentObstacle = currentObstacle.next;
+				}
+			}
+			
+			if(obstacles.length != 0 && bullets.length != 0){
+				var obstacle = obstacles.first;
+				while(obstacle != null){
+					var bullet = bullets.first;
+					while(bullet != null){
+
+						var pos = obstacle.object.position.clone();
+						var d = pos.sub(bullet.object.position).length();
+
+						//Check wheter shot hit
+						if(d < geometry.obstacle_radius + geometry.bullet_radius + 5){
+
+							this.score += 10000;
+							document.getElementById("log").innerHTML = "+ " + 10000;
+							
+							var msg = JSON.stringify({type: "hit", id: obstacle.id});
+							ws.send(msg);
+
+							scene.remove(bullet.object);
+							scene.remove(obstacle.object);
+							bullets.remove(bullet);
+							obstacles.remove(obstacle);
+						}
+
+
+						bullet = bullet.next;
+					}
+					obstacle = obstacle.next;
+				}
+			}
+
+	}
 }
