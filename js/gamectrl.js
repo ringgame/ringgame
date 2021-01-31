@@ -22,24 +22,24 @@ export default class GameCtrl {
     	if(rings[0].position.z >= camera.position.z) {
         	var distanceToMiddle = Math.sqrt(Math.pow(camera.position.x - rings[0].position.x, 2) + Math.pow(camera.position.y- rings[0].position.y, 2));
         	if(Math.abs(distanceToMiddle - geometry.ring_radius) <= (1/7)*geometry.ring_radius){
-            	document.getElementById("log").innerHTML = "Death by collision";
+            	document.getElementById("log").innerHTML = "collision";
             	alert("Game over!");
             	return true;
 
         	} else if(distanceToMiddle < geometry.ring_radius){
             	this.passed_rings++;
             	this.score += 1000 * this.frontSpeed/100;
-            	document.getElementById("log").innerHTML = "+ " + Math.round((1000 * (this.frontSpeed/100)));
+            	document.getElementById("log").innerHTML = "pass: +" + Math.round((1000 * (this.frontSpeed/100)));
 
         	} else {
             	this.missed++;
             	if(this.missed >= this.max_missed){
                 	document.getElementById("rings").innerHTML = this.passed_rings + "/" + (this.passed_rings + this.missed);
-                	document.getElementById("log").innerHTML = "Maximum Ring-Miss Count";
+                	document.getElementById("log").innerHTML = "max #rings missed";
                 	alert("Game over!");
                 	return true;
             }
-            	document.getElementById("log").innerHTML = "Ring missed";
+            	document.getElementById("log").innerHTML = "ring missed";
         	}
 
     	}
@@ -168,7 +168,7 @@ export default class GameCtrl {
 						if(d < geometry.obstacle_radius + geometry.bullet_radius + 5){
 
 							this.score += 10000;
-							document.getElementById("log").innerHTML = "+ " + 10000;
+							document.getElementById("log").innerHTML = "hit: +" + 10000;
 							
 							var msg = JSON.stringify({type: "hit", id: obstacle.id});
 							ws.send(msg);

@@ -9,6 +9,7 @@
 	a:visited {color: green;}
 	a:hover {color: green;}
 	a:active {color: green;}
+
 	body {
 	    background-color: black;
 	}
@@ -19,43 +20,52 @@
         }
 
         .overlay{
-            border: 2px solid #ff0000;
+            border: 2px solid black;
             color: green;
             padding: 10px;
         }
+        
+		.score{
+            color: green;
+            padding: 10px;
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 2em;
+        }
+
+		div#left {
+			border-bottom: 5px solid red;
+            font-size: 2em;
+		}
+
+		div#log {
+			margin-top: 75px;
+            font-size: 1em;
+		}
 
         div#top {
             position: fixed;
             top: 20px;
             left: 50%;
-	    transform: translate(-50%, -50%);
+	    	transform: translate(-50%, -50%);
             font-size: 2em;
-	    opacity: 0.5;
+	    	opacity: 0.5;
         }
 
         div#right {
             position: absolute;
             top: 10px;
             right: 10px;
-        }
-
-        div#left {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            font-size: 2em;
-        }
-
-        div#log {
-            position: absolute;
-            bottom: 10px;
-            left: 10px;
+            font-size: 1.5em;
+			background-color: #111111;
         }
 
         div#controls {
             position: absolute;
             bottom: 10px;
             right: 10px;
+			background-color: #111111;
         }
     </style>
 </head>
@@ -73,8 +83,8 @@
 </div>
 
 <div id="top"><a href="../index.html">menu</a>    <a href="../templates/game.html">restart</a></div>
-<div class="overlay" id="left">00</div>
-<div class="overlay" id="log">--</div>
+<div class="score" id="left">00</div>
+<div class="score" id="log">--</div>
 <div class="overlay" id="controls">
     controls: w, a, s, d<br/>
     speed/ slow: Space/ Shift<br/>
