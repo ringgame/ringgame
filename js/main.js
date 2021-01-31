@@ -1,29 +1,30 @@
 "use strict";
 import GeometryFactory from "./geometry.js";
+import GameCtrl from "./gamectrl.js";
 //import {OBJLoader} from "./OBJLoader.js";
 
 //Global variables
 var scene;
 var ws;
 var geometry;
+var gamectrl;
 var camera;
 var clock = new THREE.Clock();
 var opponent;
 var renderer;
 var bullet = null;
 
-var score = 0;
-var passed_rings = 0;
-var missed = 0;
-
 var rings = new Array(4);
 var bullets = new LinkedList();
 var obstacles = new LinkedList();
-var sideSpeed = new THREE.Vector2(0, 0);
-var frontSpeed = 0;
-var player_pos;
 var opponent_geometry;
 var loader;
+
+var rings_count = 5;
+var ring_distance = 500;
+var ring_radius = 20;
+var bullet_radius = ring_radius/10;
+var obstacle_radius = ring_radius;
 
 //Constants
 const keyboard = new KeyListener();
@@ -31,21 +32,7 @@ const ws_seed = "My random seed";
 const rings_rnd = new Math.seedrandom(ws_seed);
 console.log(rings_rnd());
 
-const max_missed = 11000;
-const rings_count = 5;
-const ring_distance = 500;
-const ring_radius = 20;
-const bullet_radius = ring_radius/10;
-const obstacle_radius = ring_radius;
 
-const maxSideSpeed = 100;
-const minFrontSpeed = 0;
-const maxFrontSpeed = 600;
-const max_possible = maxSideSpeed * (ring_distance / maxFrontSpeed)*1.1;
-
-const frontAcc = 150;
-const sideAcc = 0.5;
-const friction = 0.9;
 
 window.onload = start();
 
@@ -109,8 +96,11 @@ function init() {
     camera.position.x = 0;
    	 
     //Create geometry object (creates geometry objects for us)
-    geometry = new GeometryFactory(ring_radius, bullet_radius, obstacle_radius, rings_count, rings_rnd, opponent_geometry);
-	
+    geometry = new GeometryFactory(ring_radius, bullet_radius, obstacle_radius, rings_count, rings_rnd, ring_distance, opponent_geometry);
+
+    //Create gamectrl
+	gamectrl = new GameCtrl(ring_distance);	
+
 	//Init random numbers with synced key
 	
 	//Add player
@@ -119,7 +109,7 @@ function init() {
 	
     //Add first Rings
     for(var i=0; i<rings_count; i++){
-        var object = geometry.createRing(0, 0, -(ring_distance*i), ring_radius);
+        var object = geometry.createRing(0, 0, -(ring_distance*i), geometry.ring_radius);
 
         //Add object to scene
         rings[i] = object;
@@ -144,43 +134,17 @@ function mainLoop() {
     var delta = clock.getDelta()*1000;
 	
 	//Websocket Sycnronization
+	var frontSpeed = gamectrl.frontSpeed;
+	var sideSpeed = gamectrl.sideSpeed;
 	var msg = JSON.stringify({type: "pos", ...camera.position, frontSpeed, sideSpeed, delta});
 	ws.send(msg);
-
     opponent.rotation.z += 0.3;
 	
-
-    //Game logic, win, lose, ring missed
-    if(rings[0].position.z >= camera.position.z) {
-        var distanceToMiddle = Math.sqrt(Math.pow(camera.position.x - rings[0].position.x, 2) + Math.pow(camera.position.y- rings[0].position.y, 2));
-        if(Math.abs(distanceToMiddle - ring_radius) <= (1/7)*ring_radius){
-            document.getElementById("log").innerHTML = "Death by collision";
-            alert("Game over!");
-            return;
-
-        } else if(distanceToMiddle < ring_radius){
-            passed_rings++;
-            score += 1000 * frontSpeed/100;
-            document.getElementById("log").innerHTML = "+ " + Math.round((1000 * (frontSpeed/100)));
-
-        } else {
-            missed++;
-            if(missed >= max_missed){
-                document.getElementById("rings").innerHTML = passed_rings + "/" + (passed_rings + missed);
-                document.getElementById("log").innerHTML = "Maximum Ring-Miss Count";
-                alert("Game over!");
-                return;
-            }
-            document.getElementById("log").innerHTML = "Ring missed";
-        }
-
-    }
-    score += frontSpeed * delta/1000;
-
-    document.getElementById("rings").innerHTML = passed_rings + "/" + (passed_rings + missed);
-    document.getElementById("speed").innerHTML = "" + Math.round(frontSpeed);
-    document.getElementById("left").innerHTML = "" + Math.round(score);
-    
+	//Check if ring was passed
+	var dead = gamectrl.ring_passed(rings, camera, geometry, delta);
+   	if(dead) {
+		return;
+	} 
 	
     //Add obstacles and rings
     if(rings[0].position.z > camera.position.z) {
@@ -191,46 +155,45 @@ function mainLoop() {
             rings[i] = rings[i+1];
         }
 
+        if((gamectrl.passed_rings + gamectrl.missed) % 2 == 0){
+            var obstacle = geometry.createObstacle(rings[rings_count-1]);
+	    	obstacles.append(obstacle[1]);
+            scene.add(obstacle[0]);
+        }
+		if((gamectrl.passed_rings + gamectrl.missed) % 3 == 0){
+            var obstacle = geometry.createObstacle(rings[rings_count-1]);
+	    	obstacles.append(obstacle[1]);
+            scene.add(obstacle[0]);
+            var obstacle = geometry.createObstacle(rings[rings_count-1]);
+	    	obstacles.append(obstacle[1]);
+            scene.add(obstacle[0]);
+        }
+        if((gamectrl.passed_rings + gamectrl.missed) % 5 == 0){
+            var obstacle = geometry.createObstacle(rings[rings_count-1]);
+	    	obstacles.append(obstacle[1]);
+            scene.add(obstacle[0]);
+            var obstacle = geometry.createObstacle(rings[rings_count-1]);
+	    	obstacles.append(obstacle[1]);
+            scene.add(obstacle[0]);
+            var obstacle = geometry.createObstacle(rings[rings_count-1]);
+	    	obstacles.append(obstacle[1]);
+            scene.add(obstacle[0]);
+        }
 		
-        if((passed_rings + missed) % 2 == 0){
-            var obstacle = geometry.createObstacle(rings[rings_count-1]);
-	    obstacles.append(obstacle[1]);
-            scene.add(obstacle[0]);
-        }
-	if((passed_rings + missed) % 3 == 0){
-            var obstacle = geometry.createObstacle(rings[rings_count-1]);
-	    obstacles.append(obstacle[1]);
-            scene.add(obstacle[0]);
-            var obstacle = geometry.createObstacle(rings[rings_count-1]);
-	    obstacles.append(obstacle[1]);
-            scene.add(obstacle[0]);
-        }
-	if((passed_rings + missed) % 5 == 0){
-            var obstacle = geometry.createObstacle(rings[rings_count-1]);
-	    obstacles.append(obstacle[1]);
-            scene.add(obstacle[0]);
-            var obstacle = geometry.createObstacle(rings[rings_count-1]);
-	    obstacles.append(obstacle[1]);
-            scene.add(obstacle[0]);
-            var obstacle = geometry.createObstacle(rings[rings_count-1]);
-	    obstacles.append(obstacle[1]);
-            scene.add(obstacle[0]);
-        }
-		
-        var rR = rings_rnd() * max_possible;
+        var rR = rings_rnd() * gamectrl.max_possible;
         var rA = rings_rnd() * 2*Math.PI;
 
-	//Random ring position
-        var rX = Math.cos(rR)*rR + rings[rings_count-2].position.x;
-        var rY = Math.sin(rR)*rR + rings[rings_count-2].position.y;
-        var nZ = rings[rings_count-2].position.z - ring_distance;
+		//Random ring position
+        var rX = Math.cos(rR)*rR + rings[geometry.rings_count-2].position.x;
+        var rY = Math.sin(rR)*rR + rings[geometry.rings_count-2].position.y;
+        var nZ = rings[geometry.rings_count-2].position.z - ring_distance;
         
-	//Random radius of rings
-        var ring_radius_random = 0.75*ring_radius + 0.5*rings_rnd()*ring_radius;
+		//Random radius of rings
+        var ring_radius_random = 0.75*geometry.ring_radius + 0.5*rings_rnd()*geometry.ring_radius;
         var object = geometry.createRing(rX, rY, nZ, ring_radius_random);
 
         //Add object to scene
-        rings[rings_count-1] = object;
+        rings[geometry.rings_count-1] = object;
         scene.add(object);
     }
 
@@ -243,13 +206,13 @@ function mainLoop() {
 	    
         var dir = new THREE.Vector3(x, y);
         var raycaster = new THREE.Raycaster();
-	raycaster.setFromCamera( dir, camera );
+		raycaster.setFromCamera( dir, camera );
 
-	//Accelerate bullet with ray vector
+		//Accelerate bullet with ray vector
         var bulletSpeed = raycaster.ray.direction.multiplyScalar(3000);
-        bulletSpeed.x += sideSpeed.x;
-        bulletSpeed.y += sideSpeed.y;
-        bulletSpeed.z -= frontSpeed;
+        bulletSpeed.x += gamectrl.sideSpeed.x;
+        bulletSpeed.y += gamectrl.sideSpeed.y;
+        bulletSpeed.z -= gamectrl.frontSpeed;
 
         var bulletObject = geometry.createBullet(camera.position);
         scene.add(bulletObject);
@@ -291,7 +254,7 @@ function mainLoop() {
             currentObstacle.object.rotation.x += 0.02;
             currentObstacle.object.rotation.y += 0.02;
 
-	    currentObstacle.object.position.x = currentObstacle.r_center.x + Math.cos(currentObstacle.angle)*currentObstacle.radius;
+	    	currentObstacle.object.position.x = currentObstacle.r_center.x + Math.cos(currentObstacle.angle)*currentObstacle.radius;
             currentObstacle.object.position.y = currentObstacle.r_center.y + Math.sin(currentObstacle.angle)*currentObstacle.radius;
 
             currentObstacle = currentObstacle.next;
@@ -307,10 +270,10 @@ function mainLoop() {
                 var pos = obstacle.object.position.clone();
                 var d = pos.sub(bullet.object.position).length();
 
-    		//Check wheter shot hit
-                if(d < obstacle_radius + bullet_radius + 5){
+    			//Check wheter shot hit
+                if(d < geometry.obstacle_radius + geometry.bullet_radius + 5){
 
-                    score += 10000;
+                    gamectrl.score += 10000;
                     document.getElementById("log").innerHTML = "+ " + 10000;
 					
 					var msg = JSON.stringify({type: "hit", id: obstacle.id});
@@ -329,43 +292,14 @@ function mainLoop() {
         }
     }
 
-    //Keyboard controls
-    if(keyboard.space && frontSpeed < maxFrontSpeed) {
-        frontSpeed += delta * (frontAcc/1000);
-
-        if(frontSpeed > maxFrontSpeed) {
-            frontSpeed = maxFrontSpeed;
-        }
-    }
-    if(keyboard.shift && frontSpeed > minFrontSpeed) {
-        frontSpeed -= delta * (frontAcc/1000);
-
-        if(frontSpeed < minFrontSpeed) {
-            frontSpeed = minFrontSpeed;
-        }
-    }
-    if(keyboard.up && sideSpeed.length() < maxSideSpeed) {
-        sideSpeed.y += delta * (sideAcc/1000);
-    }
-    if(keyboard.down && sideSpeed.length() < maxSideSpeed ) {
-        sideSpeed.y -= delta * (sideAcc/1000);
-    }
-    if(keyboard.left && sideSpeed.length() < maxSideSpeed) {
-        sideSpeed.x -= delta * (sideAcc/1000);
-    }
-    if(keyboard.right && sideSpeed.length() < maxSideSpeed) {
-        sideSpeed.x += delta * (sideAcc/1000);
-    }
-    
-
-    //Allow for friction in sidespeed
-    sideSpeed.multiplyScalar(friction);
+	//GAMECONTROLLER
+	gamectrl.controls(keyboard, delta);
     
     //Move camera forward
-    camera.position.x += delta * sideSpeed.x;
-    camera.position.y += delta * sideSpeed.y;
+    camera.position.x += delta * gamectrl.sideSpeed.x;
+    camera.position.y += delta * gamectrl.sideSpeed.y;
 
-    camera.position.z -= delta * frontSpeed/1000;
+    camera.position.z -= delta * gamectrl.frontSpeed/1000;
 
 
 
