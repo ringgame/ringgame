@@ -36,7 +36,7 @@ export default class GeometryFactory {
 	    //Create Object Geometry
 			
 	    //var geometry = this.opponent; //
-		var geometry = new THREE.TorusGeometry(r, 0.8*r, 3, 4 );
+		var geometry = new THREE.TorusGeometry(r, 0.8*r, 3, 5 );
 
 	    //ObjectMaterial
 	    //var material = new THREE.MeshBasicMaterial({ color: 0xffffff});

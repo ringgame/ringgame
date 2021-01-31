@@ -114,7 +114,7 @@ function init() {
 	//Init random numbers with synced key
 	
 	//Add player
-    opponent = geometry.createOpponent(0, 0, 0, 5);
+    opponent = geometry.createOpponent(0, 0, 1000, 4);
     scene.add(opponent);
 	
     //Add first Rings
@@ -147,6 +147,7 @@ function mainLoop() {
 	var msg = JSON.stringify({type: "pos", ...camera.position, frontSpeed, sideSpeed, delta});
 	ws.send(msg);
 
+    opponent.rotation.z += 0.3;
 	
 
     //Game logic, win, lose, ring missed
