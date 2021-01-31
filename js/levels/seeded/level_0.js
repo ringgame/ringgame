@@ -7,14 +7,19 @@ export default class Level0 {
 		
 	init(scene, rings) {
 			//Add first Rings
+			var obstacles = new LinkedList();
 			for(var i=0; i<this.geometry.rings_count; i++){
 				var object = this.geometry.createRing(0, 0, -(this.geometry.ring_distance*i), this.geometry.ring_radius);
 
 				//Add object to scene
 				rings[i] = object;
 				scene.add(object);
+				
+				var obstacle = this.geometry.createObstacle(object);
+				obstacles.append(obstacle[1]);
+				scene.add(obstacle[0]);
 			}
-			return rings;
+			return [rings, obstacles];
 	}
 	envUpdate(scene, camera, rings, obstacles) {
 

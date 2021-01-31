@@ -1,4 +1,4 @@
-export function syncEnvironment(event, scene, geometry, opponent, bullets){
+export function syncEnvironment(event, scene, geometry, opponent, obstacles, bullets){
 	const data = JSON.parse(event.data);
 	if (data.type === "pos") {
 		opponent.position.x = data.x;
@@ -6,8 +6,6 @@ export function syncEnvironment(event, scene, geometry, opponent, bullets){
 		opponent.position.z = data.z;
 	} else if (data.type === "hit") {
 		let cur = obstacles.first;				
-		console.log(cur.id);
-		console.log(data.id);
 		while(cur !== null && cur.id !== data.id) {
 			cur = cur.next;
 		}

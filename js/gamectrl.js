@@ -28,8 +28,8 @@ export default class GameCtrl {
 
         	} else if(distanceToMiddle < geometry.ring_radius){
             	this.passed_rings++;
-            	this.score += 25 * this.frontSpeed/100;
-            	document.getElementById("log").innerHTML = "pass: +" + Math.round((25 * (this.frontSpeed/100)));
+            	this.score += 10 * this.frontSpeed/100;
+            	document.getElementById("log").innerHTML = "pass: +" + Math.round((10 * (this.frontSpeed/100)));
 
         	} else {
             	this.missed++;
@@ -43,7 +43,7 @@ export default class GameCtrl {
         	}
 
     	}
-    	this.score += this.frontSpeed * delta/1000;
+    	//this.score += this.frontSpeed * delta/1000;
 
     	document.getElementById("rings").innerHTML = this.passed_rings + "/" + (this.passed_rings + this.missed);
     	document.getElementById("speed").innerHTML = "" + Math.round(this.frontSpeed);

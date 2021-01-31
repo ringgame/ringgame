@@ -34,7 +34,7 @@ window.onload = start();
 
 
 function sync(event) {
-	syncEnvironment(event, scene, geometry, opponent, bullets);
+	syncEnvironment(event, scene, geometry, opponent, obstacles, bullets);
 }
 
 function start(){
@@ -71,8 +71,10 @@ function init() {
 
 	//Create level environment loader and init env (VIEW)
 	level = new Level0(gamectrl, geometry, rings_rnd);
-	rings = level.init(scene, rings );
-	
+	var initObj = level.init(scene, rings, obstacles);
+	rings = initObj[0];
+	obstacles = initObj[1];
+
 	//Add player
     opponent = geometry.createOpponent(0, 0, 1000, geometry.player_radius);
     scene.add(opponent);
