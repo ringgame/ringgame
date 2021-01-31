@@ -36,12 +36,12 @@ export default class GeometryFactory {
 	    //Create Object Geometry
 			
 	    //var geometry = this.opponent; //
-		var geometry = new THREE.TorusGeometry(r, (1/10)*this.ring_radius, 15, 15 );
+		var geometry = new THREE.TorusGeometry(r, 0.8*r, 3, 4 );
 
 	    //ObjectMaterial
 	    //var material = new THREE.MeshBasicMaterial({ color: 0xffffff});
 
-		var texture = new THREE.TextureLoader().load( '../img/ring.jpg' );
+		var texture = new THREE.TextureLoader().load( '../img/opponent.jpg' );
 
 		// immediately use the texture for material creation
 		const material = new THREE.MeshBasicMaterial( { map: texture } );

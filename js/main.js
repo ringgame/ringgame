@@ -114,7 +114,7 @@ function init() {
 	//Init random numbers with synced key
 	
 	//Add player
-    opponent = geometry.createOpponent(0, 0, 0, 0);
+    opponent = geometry.createOpponent(0, 0, 0, 5);
     scene.add(opponent);
 	
     //Add first Rings
