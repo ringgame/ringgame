@@ -4,11 +4,12 @@ export default class Level0 {
 		this.geometry = geometry;
 		this.rings_rnd = rings_rnd;
 
-		this.gameLength = 5; //100 rings shooting range
+		this.gameLength = 10; 
 		this.rings = new Array(this.gameLength+3);
 		this.bullets = new LinkedList();
 		this.obstacles = new LinkedList();
 		this.opponent;
+		this.nextRing = 0;;
 	}
 		
 	init(scene) {
@@ -22,7 +23,7 @@ export default class Level0 {
 				this.obstacles.append(obstacle[1]);
 				scene.add(obstacle[0]);
 			}	
-			for(var i=3; i<this.gameLength+3; i++){
+			for(var i=3; i<this.gameLength; i++){
 				var rR = this.rings_rnd() * this.gamectrl.max_possible;
 				var rA = this.rings_rnd() * 2*Math.PI;
 
@@ -71,13 +72,14 @@ export default class Level0 {
 	envUpdate(scene, camera) {
 			if(this.rings[0].position.z > camera.position.z) {
 				//Remove first obstacle and add new ones
-				scene.remove(this.rings[0]);
+				scene.remove(this.rings);
+				this.nextRing = this.nextRing + 1;
 				for(var i = 0;i < this.rings.length-1;i++) {
 					this.rings[i] = this.rings[i+1];
 				}
 			}
 			//Check if level ended
-			if(camera.position.z < -(this.gameLength + 3)*(this.geometry.ring_distance+1)) {		//3 extra rings in init, we start at z= 500 and then go towars -
+			if(this.nextRing >= this.gameLength) {
             	document.getElementById("log").innerHTML = "end of level";
 				alert("end of level");	
             	return true;

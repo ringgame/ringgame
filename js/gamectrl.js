@@ -67,7 +67,6 @@ export default class GameCtrl {
 
 
 	controls(keyboard, delta) {
-	
     	//Keyboard controls
     	if(keyboard.space && this.frontSpeed < this.maxFrontSpeed) {
         	this.frontSpeed += delta * (this.frontAcc/1000);
@@ -102,7 +101,7 @@ export default class GameCtrl {
 		
 	}
 	
-	shooting(scene, ws, camera, keyboard, geometry, level, delta) {
+	shooting(scene, ws, camera, keyboard, level, delta) {
 			//Shooting
 			if(keyboard.mouse){
 				keyboard.mouse = false;
@@ -120,7 +119,7 @@ export default class GameCtrl {
 				bulletSpeed.y += this.sideSpeed.y;
 				bulletSpeed.z -= this.frontSpeed;
 
-				var bulletObject = geometry.createBullet(camera.position);
+				var bulletObject = level.geometry.createBullet(camera.position);
 				scene.add(bulletObject);
 
 				var bullet = new Bullet(bulletObject, bulletSpeed);
@@ -132,7 +131,7 @@ export default class GameCtrl {
 			
 			if(level.bullets.length != 0) {
 				//Bulltes out of range?
-				if(level.bullets.first.object.position.z - camera.position.z <= -level.gameLength * geometry.ring_distance) {
+				if(level.bullets.first.object.position.z - camera.position.z <= -level.gameLength * level.geometry.ring_distance) {
 					scene.remove(level.bullets.first.object);
 					level.bullets.removeFirst();
 				}
@@ -175,7 +174,7 @@ export default class GameCtrl {
 				var d = pos.sub(bullet.object.position).length();
 
 				//Check wheter shot hit
-				if(d < geometry.player_radius + geometry.bullet_radius + 7){
+				if(d < level.geometry.player_radius + level.geometry.bullet_radius + 7){
 
 					document.getElementById("log").innerHTML = "DEAD - halt";
 					this.lastLog = this.gameTime;
@@ -197,7 +196,7 @@ export default class GameCtrl {
 				var d = pos.sub(bullet.object.position).length();
 
 				//Check wheter shot hit
-				if(d < geometry.player_radius + geometry.bullet_radius + 5){
+				if(d < level.geometry.player_radius + level.geometry.bullet_radius + 5){
 
 					this.score += 100;
 					document.getElementById("log").innerHTML = "headshot: " + 100;
@@ -223,7 +222,7 @@ export default class GameCtrl {
 						var d = pos.sub(bullet.object.position).length();
 
 						//Check wheter shot hit
-						if(d < geometry.obstacle_radius + geometry.bullet_radius + 5){
+						if(d < level.geometry.obstacle_radius + level.geometry.bullet_radius + 5){
 
 							this.score += 50;
 							document.getElementById("log").innerHTML = "hit: +" + 50;

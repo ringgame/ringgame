@@ -113,7 +113,7 @@ function mainLoop() {
 	} 
 	
 	//Fire bullets and check if they hit
-	gamectrl.shooting(scene, ws, camera, keyboard, geometry, level, delta );
+	gamectrl.shooting(scene, ws, camera, keyboard, level, delta );
 
 	//Control: UP, DOWN, SPEED, SLOW, et, etcc
 	gamectrl.controls(keyboard, delta);
