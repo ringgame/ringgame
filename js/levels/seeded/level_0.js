@@ -80,8 +80,8 @@ export default class Level0 {
 			}
 			//Check if level ended
 			if(this.nextRing >= this.gameLength) {
-            	document.getElementById("log").innerHTML = "end of level";
-				alert("end of level");	
+            	document.getElementById("bgtext").innerHTML = "level passed";
+            	document.getElementById("log").innerHTML = "level passed";
             	return true;
 			}
 	}

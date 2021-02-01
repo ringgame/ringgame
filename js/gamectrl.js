@@ -31,8 +31,8 @@ export default class GameCtrl {
         	var distanceToMiddle = Math.sqrt(Math.pow(camera.position.x - rings[0].position.x, 2) + Math.pow(camera.position.y- rings[0].position.y, 2));
         	if(Math.abs(distanceToMiddle - geometry.ring_radius) <= (1/7)*geometry.ring_radius){
             	document.getElementById("log").innerHTML = "collision";
+            	document.getElementById("bgtext").innerHTML = "game over";
 				this.lastLog = this.gameTime;
-            	alert("Game over!");
             	return true;
 
         	} else if(distanceToMiddle < rings[0].radius){
@@ -45,9 +45,9 @@ export default class GameCtrl {
             	this.missed++;
             	if(this.missed >= this.max_missed){
                 	document.getElementById("rings").innerHTML = this.passed_rings + "/" + (this.passed_rings + this.missed);
-                	document.getElementById("log").innerHTML = "max #rings missed";
+                	document.getElementById("log").innerHTML = "missed too many rings";
+            		document.getElementById("bgtext").innerHTML = "game over";
 					this.lastLog = this.gameTime;
-                	alert("Game over!");
                 	return true;
             }
             	document.getElementById("log").innerHTML = "ring missed";

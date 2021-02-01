@@ -34,6 +34,17 @@
             font-size: 2em;
         }
 
+		div#bgtext {
+            color: #4202f0;
+            font-size: 10em;
+			text-align: center;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+	    	transform: translate(-50%, -50%);
+	    	opacity: 0.2;
+		}
+
 		div#left {
 			border-bottom: 5px solid red;
             font-size: 2em;
@@ -85,6 +96,7 @@
 <div id="top"><a href="../index.html">menu</a>    <a href="../templates/game.html">restart</a></div>
 <div class="score" id="left"></div>
 <div class="score" id="log"></div>
+<div class="score" id="bgtext"></div>
 <div class="overlay" id="controls">
     controls: w, a, s, d<br/>
     speed/ slow: Space/ Shift<br/>
