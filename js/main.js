@@ -107,7 +107,10 @@ function mainLoop() {
 	} 
 	
 	//Level 0 ring loader (load next rings and obstacles)	
-	level.envUpdate(scene, camera);
+	var dead = level.envUpdate(scene, camera);
+   	if(dead) {
+		return;
+	} 
 	
 	//Fire bullets and check if they hit
 	gamectrl.shooting(scene, ws, camera, keyboard, geometry, level, delta );

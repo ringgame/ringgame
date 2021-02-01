@@ -35,7 +35,7 @@ export default class GameCtrl {
             	alert("Game over!");
             	return true;
 
-        	} else if(distanceToMiddle < geometry.ring_radius){
+        	} else if(distanceToMiddle < rings[0].radius){
             	this.passed_rings++;
             	this.score += 10 * this.frontSpeed/100;
             	document.getElementById("log").innerHTML = "pass: +" + Math.round((10 * (this.frontSpeed/100)));
@@ -132,7 +132,7 @@ export default class GameCtrl {
 			
 			if(level.bullets.length != 0) {
 				//Bulltes out of range?
-				if(level.bullets.first.object.position.z - camera.position.z <= -2000) {
+				if(level.bullets.first.object.position.z - camera.position.z <= -level.gameLength * geometry.ring_distance) {
 					scene.remove(level.bullets.first.object);
 					level.bullets.removeFirst();
 				}
@@ -175,7 +175,7 @@ export default class GameCtrl {
 				var d = pos.sub(bullet.object.position).length();
 
 				//Check wheter shot hit
-				if(d < geometry.player_radius + geometry.bullet_radius + 5){
+				if(d < geometry.player_radius + geometry.bullet_radius + 7){
 
 					document.getElementById("log").innerHTML = "DEAD - halt";
 					this.lastLog = this.gameTime;

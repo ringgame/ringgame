@@ -30,7 +30,7 @@ export default class GeometryFactory {
 	    object.position.x = x;
 	    object.position.y = y;
 	    object.position.z = z;
-
+		object.radius = r;
 	    return object;
 	}
 	
