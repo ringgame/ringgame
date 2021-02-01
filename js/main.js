@@ -10,16 +10,11 @@ var scene;
 var ws;
 var geometry;
 var gamectrl;
+var level;
 var camera;
 var clock = new THREE.Clock();
-var opponent;
 var renderer;
-var level;
-var bullet = null;
 
-var rings = new Array(4);
-var bullets = new LinkedList();
-var obstacles = new LinkedList();
 var opponent_geometry;
 var loader;
 
@@ -29,12 +24,11 @@ const ws_seed = "My random seed";
 const rings_rnd = new Math.seedrandom(ws_seed);
 console.log(rings_rnd());
 
-
 window.onload = start();
 
 
 function sync(event) {
-	syncEnvironment(event, scene, geometry, opponent, obstacles, bullets);
+	syncEnvironment(event, scene, geometry, level.opponent, level.obstacles, level.bullets);
 }
 
 function start(){
@@ -71,13 +65,11 @@ function init() {
 
 	//Create level environment loader and init env (VIEW)
 	level = new Level0(gamectrl, geometry, rings_rnd);
-	var initObj = level.init(scene, rings, obstacles);
-	rings = initObj[0];
-	obstacles = initObj[1];
+	level.init(scene);
 
-	//Add player
-    opponent = geometry.createOpponent(0, 0, 1000, geometry.player_radius);
-    scene.add(opponent);
+	//Add player to level
+    level.opponent = geometry.createOpponent(0, 0, 1000, geometry.player_radius);
+    scene.add(level.opponent);
 
     //Create camera
     camera = new THREE.PerspectiveCamera(50, window.innerWidth/window.innerHeight, 1, 5000);
@@ -89,10 +81,8 @@ function init() {
     renderer = new THREE.WebGLRenderer();
     renderer.setClearColor(0x000000);
     renderer.setSize(window.innerWidth, window.innerHeight);
-
     var b = document.getElementsByTagName("body")[0];
     b.appendChild(renderer.domElement);
-
     renderer.render( scene, camera );
 
     window.requestAnimationFrame(mainLoop);
@@ -107,19 +97,19 @@ function mainLoop() {
 	var sideSpeed = gamectrl.sideSpeed;
 	var msg = JSON.stringify({type: "pos", ...camera.position, frontSpeed, sideSpeed, delta});
 	ws.send(msg);
-    opponent.rotation.z += 0.3;
+    level.opponent.rotation.z += 0.3;
 	
 	//Check if ring was passed, if so, did we make it?
-	var dead = gamectrl.ring_passed(rings, camera, geometry, delta);
+	var dead = gamectrl.ring_passed(level.rings, camera, geometry, delta);
    	if(dead) {
 		return;
 	} 
 	
 	//Level 0 ring loader (load next rings and obstacles)	
-	level.envUpdate(scene, camera, rings, obstacles);
+	level.envUpdate(scene, camera);
 	
 	//Fire bullets and check if they hit
-	gamectrl.shooting(scene, ws, camera, keyboard, geometry, bullets, obstacles, opponent, delta );
+	gamectrl.shooting(scene, ws, camera, keyboard, geometry, level, delta );
 
 	//Control: UP, DOWN, SPEED, SLOW, et, etcc
 	gamectrl.controls(keyboard, delta);

@@ -3,57 +3,60 @@ export default class Level0 {
 		this.gamectrl = gamectrl;
 		this.geometry = geometry;
 		this.rings_rnd = rings_rnd;
+
+		this.rings = new Array(4);
+		this.bullets = new LinkedList();
+		this.obstacles = new LinkedList();
+		this.opponent;
 	}
 		
-	init(scene, rings) {
+	init(scene) {
 			//Add first Rings
-			var obstacles = new LinkedList();
 			for(var i=0; i<this.geometry.rings_count; i++){
 				var object = this.geometry.createRing(0, 0, -(this.geometry.ring_distance*i), this.geometry.ring_radius);
 
 				//Add object to scene
-				rings[i] = object;
+				this.rings[i] = object;
 				scene.add(object);
 				
 				var obstacle = this.geometry.createObstacle(object);
-				obstacles.append(obstacle[1]);
+				this.obstacles.append(obstacle[1]);
 				scene.add(obstacle[0]);
 			}
-			return [rings, obstacles];
 	}
-	envUpdate(scene, camera, rings, obstacles) {
+	envUpdate(scene, camera) {
 
 			//Add obstacles and rings
-			if(rings[0].position.z > camera.position.z) {
+			if(this.rings[0].position.z > camera.position.z) {
 				//Remove first obstacle and add new ones
-				scene.remove(rings[0]);
+				scene.remove(this.rings[0]);
 
-				for(var i = 0;i < rings.length-1;i++) {
-					rings[i] = rings[i+1];
+				for(var i = 0;i < this.rings.length-1;i++) {
+					this.rings[i] = this.rings[i+1];
 				}
 
 				if((this.gamectrl.passed_rings + this.gamectrl.missed) % 2 == 0){
-					var obstacle = this.geometry.createObstacle(rings[this.geometry.rings_count-1]);
-					obstacles.append(obstacle[1]);
+					var obstacle = this.geometry.createObstacle(this.rings[this.geometry.rings_count-1]);
+					this.obstacles.append(obstacle[1]);
 					scene.add(obstacle[0]);
 				}
 				if((this.gamectrl.passed_rings + this.gamectrl.missed) % 3 == 0){
-					var obstacle = this.geometry.createObstacle(rings[this.geometry.rings_count-1]);
-					obstacles.append(obstacle[1]);
+					var obstacle = this.geometry.createObstacle(this.rings[this.geometry.rings_count-1]);
+					this.obstacles.append(obstacle[1]);
 					scene.add(obstacle[0]);
-					var obstacle = this.geometry.createObstacle(rings[this.geometry.rings_count-1]);
-					obstacles.append(obstacle[1]);
+					var obstacle = this.geometry.createObstacle(this.rings[this.geometry.rings_count-1]);
+					this.obstacles.append(obstacle[1]);
 					scene.add(obstacle[0]);
 				}
 				if((this.gamectrl.passed_rings + this.gamectrl.missed) % 5 == 0){
-					var obstacle = this.geometry.createObstacle(rings[this.geometry.rings_count-1]);
-					obstacles.append(obstacle[1]);
+					var obstacle = this.geometry.createObstacle(this.rings[this.geometry.rings_count-1]);
+					this.obstacles.append(obstacle[1]);
 					scene.add(obstacle[0]);
-					var obstacle = this.geometry.createObstacle(rings[this.geometry.rings_count-1]);
-					obstacles.append(obstacle[1]);
+					var obstacle = this.geometry.createObstacle(this.rings[this.geometry.rings_count-1]);
+					this.obstacles.append(obstacle[1]);
 					scene.add(obstacle[0]);
-					var obstacle = this.geometry.createObstacle(rings[this.geometry.rings_count-1]);
-					obstacles.append(obstacle[1]);
+					var obstacle = this.geometry.createObstacle(this.rings[this.geometry.rings_count-1]);
+					this.obstacles.append(obstacle[1]);
 					scene.add(obstacle[0]);
 				}
 				
@@ -61,16 +64,16 @@ export default class Level0 {
 				var rA = this.rings_rnd() * 2*Math.PI;
 
 				//Random ring position
-				var rX = Math.cos(rR)*rR + rings[this.geometry.rings_count-2].position.x;
-				var rY = Math.sin(rR)*rR + rings[this.geometry.rings_count-2].position.y;
-				var nZ = rings[this.geometry.rings_count-2].position.z - this.geometry.ring_distance;
+				var rX = Math.cos(rR)*rR + this.rings[this.geometry.rings_count-2].position.x;
+				var rY = Math.sin(rR)*rR + this.rings[this.geometry.rings_count-2].position.y;
+				var nZ = this.rings[this.geometry.rings_count-2].position.z - this.geometry.ring_distance;
 				
 				//Random radius of rings
 				var ring_radius_random = 0.75*this.geometry.ring_radius + 0.5*this.rings_rnd()*this.geometry.ring_radius;
 				var object = this.geometry.createRing(rX, rY, nZ, ring_radius_random);
 
 				//Add object to scene
-				rings[this.geometry.rings_count-1] = object;
+				this.rings[this.geometry.rings_count-1] = object;
 				scene.add(object);
 				}	
 	}

@@ -90,7 +90,7 @@ export default class GameCtrl {
 		
 	}
 	
-	shooting(scene, ws, camera, keyboard, geometry, bullets, obstacles, opponent, delta) {
+	shooting(scene, ws, camera, keyboard, geometry, level, delta) {
 			//Shooting
 			if(keyboard.mouse){
 				keyboard.mouse = false;
@@ -112,20 +112,20 @@ export default class GameCtrl {
 				scene.add(bulletObject);
 
 				var bullet = new Bullet(bulletObject, bulletSpeed);
-				bullets.append(bullet);
+				level.bullets.append(bullet);
 				
 				var msg = JSON.stringify({type: "bullet", x:bulletSpeed.x, y:bulletSpeed.y, z:bulletSpeed.z});
 				ws.send(msg);
 			}
 			
-			if(bullets.length != 0) {
+			if(level.bullets.length != 0) {
 				//Bulltes out of range?
-				if(bullets.first.object.position.z - camera.position.z <= -2000) {
-					scene.remove(bullets.first.object);
-					bullets.removeFirst();
+				if(level.bullets.first.object.position.z - camera.position.z <= -2000) {
+					scene.remove(level.bullets.first.object);
+					level.bullets.removeFirst();
 				}
 
-				var currentBullet = bullets.first;
+				var currentBullet = level.bullets.first;
 				while(currentBullet != null){
 					currentBullet.object.position.x += currentBullet.speed.x*delta/1000;
 					currentBullet.object.position.y += currentBullet.speed.y*delta/1000;
@@ -134,14 +134,14 @@ export default class GameCtrl {
 				}
 			}
 
-			if(obstacles.length != 0) {
+			if(level.obstacles.length != 0) {
 				//Obstacle out of range
-				if(obstacles.first.object.position.z - camera.position.z >= 0) {
-					scene.remove(obstacles.first.object);
-					obstacles.removeFirst();
+				if(level.obstacles.first.object.position.z - camera.position.z >= 0) {
+					scene.remove(level.obstacles.first.object);
+					level.obstacles.removeFirst();
 				}
 
-				var currentObstacle = obstacles.first;
+				var currentObstacle = level.obstacles.first;
 				while(currentObstacle != null){
 					currentObstacle.angle = currentObstacle.angle + (delta * currentObstacle.speed)/1000;
 
@@ -156,7 +156,7 @@ export default class GameCtrl {
 			}
 			
 			//Check if we are hit	
-			var bullet = bullets.first;
+			var bullet = level.bullets.first;
 			while(bullet != null){
 
 				var pos = camera.position.clone();
@@ -169,7 +169,7 @@ export default class GameCtrl {
 					this.frontSpeed = 0;	
 					this.sideSpeed = new THREE.Vector2(0, 0);
 					scene.remove(bullet.object);
-					bullets.remove(bullet);
+					level.bullets.remove(bullet);
 				}
 
 
@@ -177,10 +177,10 @@ export default class GameCtrl {
 			}
 
 			//Check if we hit opponent
-			var bullet = bullets.first;
+			var bullet = level.bullets.first;
 			while(bullet != null){
 
-				var pos = opponent.position.clone();
+				var pos = level.opponent.position.clone();
 				var d = pos.sub(bullet.object.position).length();
 
 				//Check wheter shot hit
@@ -190,7 +190,7 @@ export default class GameCtrl {
 					document.getElementById("log").innerHTML = "headshot: " + 100;
 					
 					scene.remove(bullet.object);
-					bullets.remove(bullet);
+					level.bullets.remove(bullet);
 				}
 
 
@@ -199,10 +199,10 @@ export default class GameCtrl {
 
 
 			//Check if we hit an obstacle
-			if(obstacles.length != 0 && bullets.length != 0){
-				var obstacle = obstacles.first;
+			if(level.obstacles.length != 0 && level.bullets.length != 0){
+				var obstacle = level.obstacles.first;
 				while(obstacle != null){
-					var bullet = bullets.first;
+					var bullet = level.bullets.first;
 					while(bullet != null){
 
 						var pos = obstacle.object.position.clone();
@@ -219,8 +219,8 @@ export default class GameCtrl {
 
 							scene.remove(bullet.object);
 							scene.remove(obstacle.object);
-							bullets.remove(bullet);
-							obstacles.remove(obstacle);
+							level.bullets.remove(bullet);
+							level.obstacles.remove(obstacle);
 						}
 
 
