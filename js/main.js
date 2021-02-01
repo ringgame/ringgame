@@ -91,6 +91,7 @@ function init() {
 
 function mainLoop() {
     var delta = clock.getDelta()*1000;
+	gamectrl.gameTime = gamectrl.gameTime + delta;
 	
 	//Websocket Sycronization
 	var frontSpeed = gamectrl.frontSpeed;

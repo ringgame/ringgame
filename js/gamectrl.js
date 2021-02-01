@@ -4,6 +4,8 @@ export default class GameCtrl {
 		this.passed_rings = 0;
 		this.missed = 0;
 		this.max_missed = max_missed;
+		this.gameTime = 0;
+		this.lastLog = 0;
 		
 		this.maxSideSpeed = maxSideSpeed;
 		this.minFrontSpeed = minFrontSpeed;
@@ -18,11 +20,18 @@ export default class GameCtrl {
 	}
 
 	ring_passed(rings, camera, geometry, delta) {
+		
+		//Reset log after 2 seconds 
+		if( (this. gameTime - this.lastLog) > 2000){
+            document.getElementById("log").innerHTML = "";
+		}
+		
     	//Game logic, win, lose, ring missed
     	if(rings[0].position.z >= camera.position.z) {
         	var distanceToMiddle = Math.sqrt(Math.pow(camera.position.x - rings[0].position.x, 2) + Math.pow(camera.position.y- rings[0].position.y, 2));
         	if(Math.abs(distanceToMiddle - geometry.ring_radius) <= (1/7)*geometry.ring_radius){
             	document.getElementById("log").innerHTML = "collision";
+				this.lastLog = this.gameTime;
             	alert("Game over!");
             	return true;
 
@@ -30,16 +39,19 @@ export default class GameCtrl {
             	this.passed_rings++;
             	this.score += 10 * this.frontSpeed/100;
             	document.getElementById("log").innerHTML = "pass: +" + Math.round((10 * (this.frontSpeed/100)));
+				this.lastLog = this.gameTime;
 
         	} else {
             	this.missed++;
             	if(this.missed >= this.max_missed){
                 	document.getElementById("rings").innerHTML = this.passed_rings + "/" + (this.passed_rings + this.missed);
                 	document.getElementById("log").innerHTML = "max #rings missed";
+					this.lastLog = this.gameTime;
                 	alert("Game over!");
                 	return true;
             }
             	document.getElementById("log").innerHTML = "ring missed";
+				this.lastLog = this.gameTime;
         	}
 
     	}
@@ -166,6 +178,7 @@ export default class GameCtrl {
 				if(d < geometry.player_radius + geometry.bullet_radius + 5){
 
 					document.getElementById("log").innerHTML = "DEAD - halt";
+					this.lastLog = this.gameTime;
 					this.frontSpeed = 0;	
 					this.sideSpeed = new THREE.Vector2(0, 0);
 					scene.remove(bullet.object);
@@ -188,6 +201,7 @@ export default class GameCtrl {
 
 					this.score += 100;
 					document.getElementById("log").innerHTML = "headshot: " + 100;
+					this.lastLog = this.gameTime;
 					
 					scene.remove(bullet.object);
 					level.bullets.remove(bullet);
@@ -213,6 +227,7 @@ export default class GameCtrl {
 
 							this.score += 50;
 							document.getElementById("log").innerHTML = "hit: +" + 50;
+							this.lastLog = this.gameTime;
 							
 							var msg = JSON.stringify({type: "hit", id: obstacle.id});
 							ws.send(msg);
