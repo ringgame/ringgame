@@ -174,7 +174,7 @@ export default class GameCtrl {
 				var d = pos.sub(bullet.object.position).length();
 
 				//Check wheter shot hit
-				if(d < level.geometry.player_radius + level.geometry.bullet_radius + 7){
+				if(d < level.geometry.player_radius + level.geometry.bullet_radius + 5){
 
 					document.getElementById("log").innerHTML = "DEAD - halt";
 					this.lastLog = this.gameTime;
