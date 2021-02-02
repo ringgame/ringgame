@@ -65,7 +65,7 @@ export default class GeometryFactory {
 	    //ObjectMaterial
 	    //var material = new THREE.MeshBasicMaterial({ color: 0xffffff});
 
-		var texture = new THREE.TextureLoader().load( '../img/npc.jpg' );
+		var texture = new THREE.TextureLoader().load( '../img/npc.png' );
 
 		// immediately use the texture for material creation
 		const material = new THREE.MeshBasicMaterial( { map: texture } );
@@ -74,7 +74,8 @@ export default class GeometryFactory {
 	    var object = new THREE.Mesh(geometry, material);
 
 	    var radius = 5*this.ring_radius + 3*this.ring_radius*this.rings_rnd();
-		var angle = this.rings_rnd() * 2 *Math.PI;
+		//var angle = this.rings_rnd() * 2 *Math.PI;
+		var angle = ((this.rings_rnd() < 0.5) ? -this.rings_rnd()*2*Math.PI : this.rings_rnd()*2*Math.PI);
 	    object.position.x = anchor.position.x + Math.cos(angle) * radius;
 	    object.position.y = anchor.position.y + Math.sin(angle) * radius;
 	    object.position.z = anchor.position.z;

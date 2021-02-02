@@ -6,6 +6,7 @@ export default class GameCtrl {
 		this.max_missed = max_missed;
 		this.gameTime = 0;
 		this.lastLog = 0;
+		this.lastNPCShot = 0;
 		
 		this.maxSideSpeed = maxSideSpeed;
 		this.minFrontSpeed = minFrontSpeed;
@@ -30,6 +31,7 @@ export default class GameCtrl {
 		if( (this. gameTime - this.lastLog) > 2000){
             document.getElementById("log").innerHTML = "";
 		}
+		
 		
     	//Game logic, win, lose, ring missed
     	if(rings[0].position.z >= camera.position.z) {
@@ -129,6 +131,24 @@ export default class GameCtrl {
 			var bulletObject = level.geometry.createBullet(camera.position);
 		} else if (type == 'special'){
 			var bulletObject = level.geometry.createSpecialBullet(level.rings[0].position);
+		} else if (type == 'npc'){
+			var dir = new THREE.Vector3();
+			
+			var xv = level.geometry.rings_rnd() * 25;				
+			var yv = level.geometry.rings_rnd() * 25;				
+			var zv = level.geometry.rings_rnd() * 25;				
+			var posv = {}
+			posv.x = ((level.geometry.rings_rnd() < 0.5) ? camera.position.x + xv: camera.position.x - xv);
+			posv.y = ((level.geometry.rings_rnd() < 0.5) ? camera.position.y + yv: camera.position.y - yv);
+			posv.z = ((level.geometry.rings_rnd() < 0.5) ? camera.position.z + zv: camera.position.z - zv);
+
+			//to, from
+			dir = dir.subVectors( posv, level.npcs.first.object.position).normalize();
+
+			//origin, direction
+			var raycaster = new THREE.Raycaster(level.rings[0].position, dir );
+			var bulletSpeed = raycaster.ray.direction.multiplyScalar(3000);
+			var bulletObject = level.geometry.createSpecialBullet(level.npcs.first.object.position);
 		}
 		scene.add(bulletObject);
 
@@ -149,6 +169,12 @@ export default class GameCtrl {
 
 	shooting(scene, ws, camera, keyboard, level, delta) {
 			//Shooting
+			if(level.npcs.first != null) {
+				if( ((this.gameTime - this.lastNPCShot) > 500) && ((camera.position.z - level.npcs.first.object.position.z) < level.geometry.ring_distance*3)){
+					this.lastNPCShot = this.gameTime;
+					this.addBullet(scene, ws, camera, keyboard, level, 'npc');
+				}
+			}
 			if(keyboard.context){
 				keyboard.context = false;
 				this.addBullet(scene, ws, camera, keyboard, level, 'special');
@@ -174,6 +200,14 @@ export default class GameCtrl {
 				}
 			}
 
+			if(level.npcs.length != 0) {
+				//Obstacle out of range
+				if(level.npcs.first.object.position.z - camera.position.z >= 0) {
+					scene.remove(level.npcs.first.object);
+					level.npcs.removeFirst();
+				}
+			}
+			
 			if(level.obstacles.length != 0) {
 				//Obstacle out of range
 				if(level.obstacles.first.object.position.z - camera.position.z >= 0) {

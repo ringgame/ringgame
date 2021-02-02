@@ -4,7 +4,7 @@ export default class Level0 {
 		this.geometry = geometry;
 		this.rings_rnd = rings_rnd;
 
-		this.gameLength = 10; 
+		this.gameLength = 20; 
 		this.rings = new Array(this.gameLength+3);
 		this.bullets = new LinkedList();
 		this.obstacles = new LinkedList();
@@ -54,10 +54,10 @@ export default class Level0 {
 					this.obstacles.append(obstacle[1]);
 					scene.add(obstacle[0]);
 					
-					//var npc = this.geometry.createNPC(this.rings[i-1], this.geometry.npc_radius);
-	    			//var gameOb = new NPC(npc);
-					//this.npcs.append(gameOb);
-					//scene.add(npc);
+					var npc = this.geometry.createNPC(this.rings[i-1], this.geometry.npc_radius/3);
+	    			var gameOb = new NPC(npc);
+					this.npcs.append(gameOb);
+					scene.add(npc);
 				}
 				if(i % 5 == 0){
 					var obstacle = this.geometry.createObstacle(this.rings[i-1]);
