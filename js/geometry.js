@@ -57,23 +57,44 @@ export default class GeometryFactory {
 	    return object;
 	}
 
-	createBullet(camera) {
+	createBullet(pos) {
 		
 	    //Create Object Geometry
-	    var geometry = new THREE.SphereGeometry( this.bullet_radius, 8, 8 );
+		var r = this.bullet_radius;
+	    var geometry = new THREE.SphereGeometry( r, 8, 8 );
 
 	    //ObjectMaterial
 	    var material = new THREE.MeshBasicMaterial({ color: 0x45A505});
 
 	    //Create Objects
 	    var object = new THREE.Mesh(geometry, material);
-	    object.position.x = camera.x;
-	    object.position.y = camera.y;
-	    object.position.z = camera.z;
+	    object.position.x = pos.x;
+	    object.position.y = pos.y;
+	    object.position.z = pos.z;
+	    object.radius = r;
+	    object.type = 'standard';
 
 	    return object;
 	}
 
+	createSpecialBullet(position) {
+	    //Create Object Geometry
+		var r = this.bullet_radius*3;
+	    var geometry = new THREE.SphereGeometry( r, 8, 8 );
+
+	    //ObjectMaterial
+	    var material = new THREE.MeshBasicMaterial({ color: 0x347aeb});
+
+	    //Create Objects
+	    var object = new THREE.Mesh(geometry, material);
+	    object.position.x = position.x;
+	    object.position.y = position.y;
+	    object.position.z = position.z;
+	    object.radius = r;
+	    object.type = 'special';
+
+	    return object;
+	}
 	createObstacle(anchor, rot_radius=-1) {
 	    //Create Object Geometry
 	    var geometry = new THREE.TetrahedronGeometry( this.obstacle_radius );

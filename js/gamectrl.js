@@ -109,37 +109,51 @@ export default class GameCtrl {
     	this.sideSpeed.multiplyScalar(this.friction);
 		
 	}
-	
+	addBullet(scene, ws, camera, keyboard, level, type) {
+		var x = ((2*keyboard.x)/window.innerWidth) -1;
+		var y = (((2*keyboard.y)/window.innerHeight) -1)*(-1);
+		
+		var dir = new THREE.Vector3(x, y);
+		var raycaster = new THREE.Raycaster();
+		raycaster.setFromCamera( dir, camera );
+
+		//Accelerate bullet with ray vector
+		var bulletSpeed = raycaster.ray.direction.multiplyScalar(3000);
+		bulletSpeed.x += this.sideSpeed.x;
+		bulletSpeed.y += this.sideSpeed.y;
+		bulletSpeed.z -= this.frontSpeed;
+		
+		if (type == 'standard') {
+			var bulletObject = level.geometry.createBullet(camera.position);
+		} else if (type == 'special'){
+			var bulletObject = level.geometry.createSpecialBullet(level.rings[0].position);
+		}
+		scene.add(bulletObject);
+
+		var bullet = new Bullet(bulletObject, bulletSpeed);
+		if (this.bullet_sound != null) {
+			var sound = new Audio(this.bullet_sound);
+			sound.play();
+		}
+		level.bullets.append(bullet);
+		
+		var msg = JSON.stringify({type: "bullet", 
+			x:bulletSpeed.x, y:bulletSpeed.y, z:bulletSpeed.z, 
+			bulletType:bulletObject.type, 
+			posX:bulletObject.position.x, posY:bulletObject.position.y, posZ:bulletObject.position.z});
+		ws.send(msg);
+
+	}	
+
 	shooting(scene, ws, camera, keyboard, level, delta) {
 			//Shooting
+			if(keyboard.context){
+				keyboard.context = false;
+				this.addBullet(scene, ws, camera, keyboard, level, 'special');
+			}
 			if(keyboard.mouse){
 				keyboard.mouse = false;
-
-				var x = ((2*keyboard.x)/window.innerWidth) -1;
-				var y = (((2*keyboard.y)/window.innerHeight) -1)*(-1);
-				
-				var dir = new THREE.Vector3(x, y);
-				var raycaster = new THREE.Raycaster();
-				raycaster.setFromCamera( dir, camera );
-
-				//Accelerate bullet with ray vector
-				var bulletSpeed = raycaster.ray.direction.multiplyScalar(3000);
-				bulletSpeed.x += this.sideSpeed.x;
-				bulletSpeed.y += this.sideSpeed.y;
-				bulletSpeed.z -= this.frontSpeed;
-
-				var bulletObject = level.geometry.createBullet(camera.position);
-				scene.add(bulletObject);
-
-				var bullet = new Bullet(bulletObject, bulletSpeed);
-				if (this.bullet_sound != null) {
-					var sound = new Audio(this.bullet_sound);
-					sound.play();
-				}
-				level.bullets.append(bullet);
-				
-				var msg = JSON.stringify({type: "bullet", x:bulletSpeed.x, y:bulletSpeed.y, z:bulletSpeed.z});
-				ws.send(msg);
+				this.addBullet(scene, ws, camera, keyboard, level, 'standard');
 			}
 			
 			if(level.bullets.length != 0) {
@@ -187,7 +201,7 @@ export default class GameCtrl {
 				var d = pos.sub(bullet.object.position).length();
 
 				//Check wheter shot hit
-				if(d < level.geometry.player_radius + level.geometry.bullet_radius + 5){
+				if(d < level.geometry.player_radius + bullet.object.radius + 5){
 
 					document.getElementById("log").innerHTML = "DEAD - halt";
 					this.lastLog = this.gameTime;
@@ -209,7 +223,7 @@ export default class GameCtrl {
 				var d = pos.sub(bullet.object.position).length();
 
 				//Check wheter shot hit
-				if(d < level.geometry.player_radius + level.geometry.bullet_radius + 5){
+				if(d < level.geometry.player_radius + bullet.object.radius + 5){
 
 					this.score += 100;
 					document.getElementById("log").innerHTML = "headshot: " + 100;
@@ -235,7 +249,7 @@ export default class GameCtrl {
 						var d = pos.sub(bullet.object.position).length();
 
 						//Check wheter shot hit
-						if(d < level.geometry.obstacle_radius + level.geometry.bullet_radius + 5){
+						if(d < level.geometry.obstacle_radius + bullet.object.radius + 5){
 
 							this.score += 50;
 							if (this.obstacle_sound != null) {

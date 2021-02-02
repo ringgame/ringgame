@@ -16,9 +16,21 @@ export function syncEnvironment(event, scene, geometry, opponent, obstacles, bul
 		scene.remove(cur.object);
 		obstacles.remove(cur);
 	} else if (data.type === "bullet") {
-		var bulletObject = geometry.createBullet(opponent.position);
-        scene.add(bulletObject);
-        var bullet = new Bullet(bulletObject, data);
-        bullets.append(bullet);
+		if (data.bulletType == 'standard'){
+			var bulletObject = geometry.createBullet(opponent.position);
+        	scene.add(bulletObject);
+        	var bullet = new Bullet(bulletObject, data);
+        	bullets.append(bullet);
+		} else if (data.bulletType == 'special') {
+			var posX = data.posX;
+			var posY = data.posY;
+			var posZ = data.posZ;
+
+			var bulletObject = geometry.createSpecialBullet({x:posX, y:posY, z:posZ});
+        	scene.add(bulletObject);
+        	var bullet = new Bullet(bulletObject, data);
+        	bullets.append(bullet);
+			
+		}
 	}
 };

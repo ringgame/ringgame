@@ -7,6 +7,7 @@ function KeyListener(){
     this.space = false;
     this.shift = false;
     this.mouse = false;
+    this.context = false;
     this.x;
     this.y;
     
@@ -64,15 +65,37 @@ function KeyListener(){
     }, false);
 
     document.addEventListener( 'mousedown', function(e){
-        self.x = e.clientX;
-        self.y = e.clientY;
-        self.mouse = true;
-        e.preventDefault();
+		switch (event.which) {
+        case 1:
+			//left click
+        	self.x = e.clientX;
+        	self.y = e.clientY;
+        	self.mouse = true;
+        	e.preventDefault();
+            break;
+        case 2:
+			//middle click
+            break;
+        case 3:
+			//right cklick
+        	self.x = e.clientX;
+        	self.y = e.clientY;
+        	self.context = true;
+        	e.preventDefault();
+            break;
+    	}
+
     }, false );
 
     document.addEventListener( 'mouseup', function(e){
         self.mouse = false;
-
         e.preventDefault();
     }, false );
+
+
+	
+    document.addEventListener( 'contextmenu', function(e){
+        e.preventDefault();
+    }, false );
+
 }
