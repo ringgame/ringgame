@@ -17,6 +17,11 @@ export default class GameCtrl {
 		this.frontAcc = 150;
 		this.sideAcc = 0.5;
 		this.friction = 0.9;
+		
+		//No sound if vars are null
+		this.portal_sound = '../audio/portal.wav';
+		this.obstacle_sound = '../audio/obstacle.wav';
+		this.bullet_sound = '../audio/shot.wav';
 	}
 
 	ring_passed(rings, camera, geometry, delta) {
@@ -38,6 +43,10 @@ export default class GameCtrl {
         	} else if(distanceToMiddle < rings[0].radius){
             	this.passed_rings++;
             	this.score += 10 * this.frontSpeed/100;
+				if (this.portal_sound != null) {
+					var sound = new Audio(this.portal_sound);
+					sound.play();
+				}
             	document.getElementById("log").innerHTML = "pass: +" + Math.round((10 * (this.frontSpeed/100)));
 				this.lastLog = this.gameTime;
 
@@ -123,6 +132,10 @@ export default class GameCtrl {
 				scene.add(bulletObject);
 
 				var bullet = new Bullet(bulletObject, bulletSpeed);
+				if (this.bullet_sound != null) {
+					var sound = new Audio(this.bullet_sound);
+					sound.play();
+				}
 				level.bullets.append(bullet);
 				
 				var msg = JSON.stringify({type: "bullet", x:bulletSpeed.x, y:bulletSpeed.y, z:bulletSpeed.z});
@@ -225,6 +238,11 @@ export default class GameCtrl {
 						if(d < level.geometry.obstacle_radius + level.geometry.bullet_radius + 5){
 
 							this.score += 50;
+							if (this.obstacle_sound != null) {
+								var sound = new Audio(this.obstacle_sound);
+								sound.volume = 0.3;
+								sound.play();
+							}
 							document.getElementById("log").innerHTML = "hit: +" + 50;
 							this.lastLog = this.gameTime;
 							
