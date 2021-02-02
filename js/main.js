@@ -20,7 +20,7 @@ var loader;
 
 //Constants
 const keyboard = new KeyListener();
-const ws_seed = "My random seed";
+const ws_seed = "My random seed !";
 const rings_rnd = new Math.seedrandom(ws_seed);
 console.log(rings_rnd());
 
@@ -99,6 +99,11 @@ function mainLoop() {
 	var msg = JSON.stringify({type: "pos", ...camera.position, frontSpeed, sideSpeed, delta});
 	ws.send(msg);
     level.opponent.rotation.z += 0.3;
+    var curBoss = level.npcs.first;
+	while(curBoss != null) {
+		curBoss.object.rotation.z += 0.3;
+		curBoss = curBoss.next;
+	}
 	
 	//Check if ring was passed, if so, did we make it?
 	var dead = gamectrl.ring_passed(level.rings, camera, geometry, delta);

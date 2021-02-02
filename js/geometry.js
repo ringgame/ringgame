@@ -1,6 +1,7 @@
 export default class GeometryFactory {
 	constructor(ring_radius, bullet_radius, obstacle_radius, rings_count, rings_rnd, ring_distance, player_radius, opponent_geometry=null) {
 		this.ring_radius = ring_radius;
+		this.npc_radius = ring_radius;
 		this.bullet_radius = bullet_radius;
 		this.obstacle_radius = obstacle_radius;
 		this.rings_count = rings_count;
@@ -35,7 +36,6 @@ export default class GeometryFactory {
 	}
 	
 	createOpponent(x,y,z,r) {
-	    //Create Object Geometry
 			
 	    //var geometry = this.opponent; //
 		var geometry = new THREE.TorusGeometry(r, 0.8*r, 3, 5 );
@@ -53,6 +53,31 @@ export default class GeometryFactory {
 	    object.position.x = x;
 	    object.position.y = y;
 	    object.position.z = z;
+
+	    return object;
+	}
+	
+	createNPC(anchor, r, rot_radius=-1) {
+	    //Create Object Geometry
+			
+		var geometry = new THREE.TorusGeometry(r, 0.8*r, 3, 3 );
+
+	    //ObjectMaterial
+	    //var material = new THREE.MeshBasicMaterial({ color: 0xffffff});
+
+		var texture = new THREE.TextureLoader().load( '../img/npc.jpg' );
+
+		// immediately use the texture for material creation
+		const material = new THREE.MeshBasicMaterial( { map: texture } );
+
+	    //Create Objects
+	    var object = new THREE.Mesh(geometry, material);
+
+	    var radius = 5*this.ring_radius + 3*this.ring_radius*this.rings_rnd();
+		var angle = this.rings_rnd() * 2 *Math.PI;
+	    object.position.x = anchor.position.x + Math.cos(angle) * radius;
+	    object.position.y = anchor.position.y + Math.sin(angle) * radius;
+	    object.position.z = anchor.position.z;
 
 	    return object;
 	}

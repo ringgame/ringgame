@@ -20,6 +20,7 @@ export function syncEnvironment(event, scene, geometry, opponent, obstacles, bul
 			var bulletObject = geometry.createBullet(opponent.position);
         	scene.add(bulletObject);
         	var bullet = new Bullet(bulletObject, data);
+			bullet.origin = "opponent";
         	bullets.append(bullet);
 		} else if (data.bulletType == 'special') {
 			var posX = data.posX;
@@ -29,6 +30,7 @@ export function syncEnvironment(event, scene, geometry, opponent, obstacles, bul
 			var bulletObject = geometry.createSpecialBullet({x:posX, y:posY, z:posZ});
         	scene.add(bulletObject);
         	var bullet = new Bullet(bulletObject, data);
+			bullet.origin = "opponent";
         	bullets.append(bullet);
 			
 		}

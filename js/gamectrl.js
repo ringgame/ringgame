@@ -109,6 +109,7 @@ export default class GameCtrl {
     	this.sideSpeed.multiplyScalar(this.friction);
 		
 	}
+
 	addBullet(scene, ws, camera, keyboard, level, type) {
 		var x = ((2*keyboard.x)/window.innerWidth) -1;
 		var y = (((2*keyboard.y)/window.innerHeight) -1)*(-1);
@@ -122,7 +123,8 @@ export default class GameCtrl {
 		bulletSpeed.x += this.sideSpeed.x;
 		bulletSpeed.y += this.sideSpeed.y;
 		bulletSpeed.z -= this.frontSpeed;
-		
+
+		var bulletObject;
 		if (type == 'standard') {
 			var bulletObject = level.geometry.createBullet(camera.position);
 		} else if (type == 'special'){
@@ -214,6 +216,31 @@ export default class GameCtrl {
 
 				bullet = bullet.next;
 			}
+			//Check if we hit npc
+			var bullet = level.bullets.first;
+			while(bullet != null){
+				var npc = level.npcs.first;
+				while(npc != null) {
+					var pos = npc.object.position.clone();
+					var d = pos.sub(bullet.object.position).length();
+
+					//Check wheter shot hit
+					if((d < level.geometry.npc_radius + bullet.object.radius + 5) && (bullet.origin != "opponent")){
+
+						this.score += 100;
+						document.getElementById("log").innerHTML = "headshot: " + 100;
+						this.lastLog = this.gameTime;
+					
+						scene.remove(npc.object);
+						scene.remove(bullet.object);
+						level.bullets.remove(bullet);
+						level.npcs.remove(npc);
+					}
+					npc = npc.next;
+				}
+
+				bullet = bullet.next;
+			}
 
 			//Check if we hit opponent
 			var bullet = level.bullets.first;
@@ -249,7 +276,7 @@ export default class GameCtrl {
 						var d = pos.sub(bullet.object.position).length();
 
 						//Check wheter shot hit
-						if(d < level.geometry.obstacle_radius + bullet.object.radius + 5){
+						if((d < level.geometry.obstacle_radius + bullet.object.radius + 5) && (bullet.origin != "opponent")){
 
 							this.score += 50;
 							if (this.obstacle_sound != null) {

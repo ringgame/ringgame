@@ -54,6 +54,10 @@ function LinkedList(){
     }
 }
 
+function NPC(object){
+    this.object = object;
+    this.name = "NPC";
+}
 function Bullet(object, speed){
     this.object = object;
     this.speed = speed;

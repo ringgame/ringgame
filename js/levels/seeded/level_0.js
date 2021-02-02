@@ -8,6 +8,7 @@ export default class Level0 {
 		this.rings = new Array(this.gameLength+3);
 		this.bullets = new LinkedList();
 		this.obstacles = new LinkedList();
+		this.npcs = new LinkedList();
 		this.opponent;
 		this.nextRing = 0;;
 	}
@@ -52,6 +53,11 @@ export default class Level0 {
 					var obstacle = this.geometry.createObstacle(this.rings[i-1]);
 					this.obstacles.append(obstacle[1]);
 					scene.add(obstacle[0]);
+					
+					//var npc = this.geometry.createNPC(this.rings[i-1], this.geometry.npc_radius);
+	    			//var gameOb = new NPC(npc);
+					//this.npcs.append(gameOb);
+					//scene.add(npc);
 				}
 				if(i % 5 == 0){
 					var obstacle = this.geometry.createObstacle(this.rings[i-1]);
