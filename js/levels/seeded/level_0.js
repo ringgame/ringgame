@@ -54,7 +54,7 @@ export default class Level0 {
 					this.obstacles.append(obstacle[1]);
 					scene.add(obstacle[0]);
 					
-					var npc = this.geometry.createNPC(this.rings[i-1], this.geometry.npc_radius/3);
+					var npc = this.geometry.createNPC(this.rings[i-1], this.geometry.npc_radius);
 	    			var gameOb = new NPC(npc);
 					this.npcs.append(gameOb);
 					scene.add(npc);

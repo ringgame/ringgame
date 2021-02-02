@@ -21,7 +21,7 @@ export default class GameCtrl {
 		
 		//No sound if vars are null
 		this.portal_sound = '../audio/portal.wav';
-		this.obstacle_sound = '../audio/obstacle.wav';
+		this.obstacle_sound = '../audio/obstacle.mp3';
 		this.bullet_sound = '../audio/shot.wav';
 	}
 
@@ -47,6 +47,7 @@ export default class GameCtrl {
             	this.score += 10 * this.frontSpeed/100;
 				if (this.portal_sound != null) {
 					var sound = new Audio(this.portal_sound);
+					sound.volume = 0.4;
 					sound.play();
 				}
             	document.getElementById("log").innerHTML = "pass: +" + Math.round((10 * (this.frontSpeed/100)));
@@ -155,6 +156,7 @@ export default class GameCtrl {
 		var bullet = new Bullet(bulletObject, bulletSpeed);
 		if (this.bullet_sound != null) {
 			var sound = new Audio(this.bullet_sound);
+			sound.volume = 0.2;
 			sound.play();
 		}
 		level.bullets.append(bullet);
@@ -315,7 +317,7 @@ export default class GameCtrl {
 							this.score += 50;
 							if (this.obstacle_sound != null) {
 								var sound = new Audio(this.obstacle_sound);
-								sound.volume = 0.3;
+								sound.volume = 0.05;
 								sound.play();
 							}
 							document.getElementById("log").innerHTML = "hit: +" + 50;
