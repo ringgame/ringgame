@@ -4,6 +4,10 @@ export function syncEnvironment(event, scene, geometry, opponent, obstacles, bul
 		opponent.position.x = data.x;
 		opponent.position.y = data.y;
 		opponent.position.z = data.z;
+		
+		opponent.speed.x = data.sideSpeed.x;
+		opponent.speed.y = data.sideSpeed.y;
+		opponent.speed.z = data.frontSpeed;
 	} else if (data.type === "hit") {
 		let cur = obstacles.first;				
 		while(cur !== null && cur.id !== data.id) {

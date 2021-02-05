@@ -17,6 +17,7 @@ var renderer;
 
 var opponent_geometry;
 var loader;
+var lastUpdate = 10000000;
 
 //Constants
 const keyboard = new KeyListener();
@@ -41,7 +42,7 @@ function start(){
 		ws.onmessage = syncEnvironment;
 	});*/
 	//Create websocket
-	ws = new WebSocket("ws://localhost:8080");
+	ws = new WebSocket("ws://34.82.186.152:8080");
   	ws.onopen = function(event) {init();console.log("WebSocket is open now.");};
 	ws.onmessage = sync;
 }
@@ -69,6 +70,7 @@ function init() {
 
 	//Add player to level
     level.opponent = geometry.createOpponent(0, 0, 1000, geometry.player_radius);
+	level.opponent.speed = {x:0,y:0,z:0};
     scene.add(level.opponent);
 
     //Create camera
@@ -96,10 +98,17 @@ function mainLoop() {
 	//Websocket Sycronization
 	var frontSpeed = gamectrl.frontSpeed;
 	var sideSpeed = gamectrl.sideSpeed;
-	var msg = JSON.stringify({type: "pos", ...camera.position, frontSpeed, sideSpeed, delta});
-	ws.send(msg);
-    level.opponent.rotation.z += 0.3;
-    var curBoss = level.npcs.first;
+
+	if(lastUpdate > 1000 / 50) { 
+		var msg = JSON.stringify({type: "pos", ...camera.position, frontSpeed, sideSpeed, delta});
+		ws.send(msg);
+		lastUpdate = 0;
+    	} else {
+		lastUpdate += delta;
+	}
+
+	level.opponent.rotation.z += 0.3;
+    	var curBoss = level.npcs.first;
 	while(curBoss != null) {
 		curBoss.object.rotation.z += 0.3;
 		curBoss = curBoss.next;
@@ -124,9 +133,15 @@ function mainLoop() {
 	gamectrl.controls(keyboard, delta);
     
     //Move camera forward
-    camera.position.x += delta * gamectrl.sideSpeed.x;
-    camera.position.y += delta * gamectrl.sideSpeed.y;
-    camera.position.z -= delta * gamectrl.frontSpeed/1000;
+	camera.position.x += delta * gamectrl.sideSpeed.x;
+    	camera.position.y += delta * gamectrl.sideSpeed.y;
+    	camera.position.z -= delta * gamectrl.frontSpeed/1000;
+
+	level.opponent.position.x += delta * level.opponent.speed.x;
+    	level.opponent.position.y += delta * level.opponent.speed.y;
+    	level.opponent.position.z -= delta * level.opponent.speed.z;
+
+
 	
 	//Render scene
     renderer.render(scene, camera);
